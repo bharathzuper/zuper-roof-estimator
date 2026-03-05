@@ -2,6 +2,8 @@ export interface RoofSection {
 	id: string;
 	label: string;
 	areaSqFt: number;
+	pitch?: string;
+	azimuth?: string;
 	polygon: { x: number; y: number }[];
 	dimensions: { label: string; x: number; y: number; rotation?: number }[];
 }
@@ -26,7 +28,11 @@ export type RoofMaterial = 'asphalt' | 'metal' | 'tile' | 'cedar';
 
 export interface MaterialOption {
 	id: RoofMaterial;
+	name: string;
 	label: string;
+	description: string;
+	lifespan: string;
+	priceRange: string;
 	imageUrl: string;
 }
 
@@ -46,15 +52,19 @@ export interface TierConfig {
 export interface PricingBreakdown {
 	materials: number;
 	labor: number;
-	tearOff: number;
+	removal: number;
 	permits: number;
-	total: number;
+	dumpster: number;
 }
 
 export interface TierEstimate {
-	tier: TierConfig;
+	tierName: string;
+	materialName: string;
+	warranty: string;
+	totalCost: number;
+	costPerSqFt: number;
+	monthlyPayment: number;
 	breakdown: PricingBreakdown;
-	monthlyPayments: Record<number, number>;
 }
 
 export interface LeadFormData {
@@ -63,10 +73,10 @@ export interface LeadFormData {
 	email: string;
 	phone: string;
 	preferredContact: 'call' | 'text' | 'email';
-	bestTime: 'morning' | 'afternoon' | 'evening';
+	notes: string;
 }
 
-export type WizardStep = 1 | 2 | 3 | 4 | 5;
+export type WizardStep = 1 | 2 | 3 | 4;
 
 export type DesiredMaterial = 'asphalt' | 'metal' | 'tile';
 export type ProjectTimeline = 'now' | '1-3months' | 'no-timeline';

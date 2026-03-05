@@ -1,115 +1,97 @@
 'use client';
 
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { TierEstimate } from '@/lib/types';
-import AnimatedCounter from './AnimatedCounter';
 
-export default function PricingCard({
-	estimate,
-	isPopular,
-	delay,
-	financingMonths,
-}: {
-	estimate: TierEstimate;
+interface PricingCardProps {
+	tier: TierEstimate;
+	index: number;
 	isPopular: boolean;
-	delay: number;
-	financingMonths: number;
-}) {
-	const [showBreakdown, setShowBreakdown] = useState(false);
-	const { tier, breakdown, monthlyPayments } = estimate;
+	onSelect: () => void;
+}
 
+export default function PricingCard({ tier, index, isPopular, onSelect }: PricingCardProps) {
 	return (
 		<motion.div
-			className={`relative rounded-2xl overflow-hidden transition-all ${
+			className={`relative rounded-2xl overflow-hidden transition-all group ${
 				isPopular
-					? 'bg-gradient-to-b from-blue-500/10 to-blue-500/5 ring-1 ring-blue-500/30 shadow-2xl shadow-blue-500/10 scale-[1.02] z-10'
-					: 'bg-white/[0.03] border border-white/5'
+					? 'border-2 border-teal-500/60 bg-gradient-to-b from-teal-500/[0.08] to-transparent scale-[1.03] z-10 shadow-2xl shadow-teal-500/10'
+					: 'border border-white/[0.06] bg-white/[0.02] hover:border-white/10'
 			}`}
-			initial={{ opacity: 0, y: 40 }}
+			initial={{ opacity: 0, y: 30 }}
 			animate={{ opacity: 1, y: 0 }}
-			transition={{ delay, duration: 0.5, type: 'spring', stiffness: 100 }}
+			transition={{ delay: 0.2 + index * 0.12, type: 'spring', stiffness: 120 }}
 		>
 			{isPopular && (
-				<div className="bg-blue-600 text-white text-xs font-bold tracking-wider uppercase py-1.5 text-center">
-					Recommended
-				</div>
+				<div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-teal-400 to-transparent" />
 			)}
 
-			<div className={`p-6 ${isPopular ? '' : 'pt-8'}`}>
-				<div className="mb-4">
-					<div className="text-xs font-semibold text-blue-400 uppercase tracking-wider">{tier.label}</div>
-					<div className="text-sm text-slate-500 mt-0.5">{tier.tagline}</div>
-				</div>
-
-				<div className="relative h-28 rounded-xl overflow-hidden mb-4 bg-slate-800/50">
-					<div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${tier.materialImage})` }} />
-					<div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-					<div className="absolute bottom-2 left-3 text-white text-sm font-semibold">{tier.materialName}</div>
-				</div>
-
-				<div className="mb-4">
-					<div className="text-3xl font-bold text-white">
-						<AnimatedCounter value={breakdown.total} prefix="$" duration={1} className="text-white" />
-					</div>
-					<div className="text-xs text-slate-500 mt-1">
-						or <span className="font-semibold text-blue-400">${monthlyPayments[financingMonths]}/mo</span> for {financingMonths} months
-					</div>
-				</div>
-
-				<div className="text-xs text-slate-400 mb-1 font-medium">{tier.warranty}</div>
-
-				<div className="border-t border-white/5 pt-3 mt-3">
-					<ul className="space-y-2">
-						{tier.features.map((f) => (
-							<li key={f} className="flex items-start gap-2 text-xs text-slate-400">
-								<svg className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-									<polyline points="20 6 9 17 4 12" />
-								</svg>
-								{f}
-							</li>
-						))}
-					</ul>
-				</div>
-
-				<button
-					onClick={() => setShowBreakdown(!showBreakdown)}
-					className="mt-4 w-full text-xs text-blue-400 font-medium flex items-center justify-center gap-1 hover:text-blue-300 transition-colors"
-				>
-					{showBreakdown ? 'Hide' : 'View'} breakdown
-					<motion.svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" animate={{ rotate: showBreakdown ? 180 : 0 }}>
-						<polyline points="6 9 12 15 18 9" />
-					</motion.svg>
-				</button>
-
-				<AnimatePresence>
-					{showBreakdown && (
-						<motion.div
-							initial={{ height: 0, opacity: 0 }}
-							animate={{ height: 'auto', opacity: 1 }}
-							exit={{ height: 0, opacity: 0 }}
-							className="overflow-hidden"
-						>
-							<div className="mt-3 pt-3 border-t border-white/5 space-y-2 text-xs">
-								{[
-									{ label: 'Materials', value: breakdown.materials },
-									{ label: 'Labor', value: breakdown.labor },
-									{ label: 'Tear-off & Disposal', value: breakdown.tearOff },
-									{ label: 'Permits & Fees', value: breakdown.permits },
-								].map((item) => (
-									<div key={item.label} className="flex justify-between text-slate-400">
-										<span>{item.label}</span>
-										<span className="font-medium text-slate-300">${item.value.toLocaleString()}</span>
-									</div>
-								))}
-								<div className="flex justify-between text-white font-bold pt-1 border-t border-white/5">
-									<span>Total</span>
-									<span>${breakdown.total.toLocaleString()}</span>
-								</div>
-							</div>
-						</motion.div>
+			<div className="p-5 sm:p-6">
+				{/* Header */}
+				<div className="flex items-center justify-between mb-1">
+					<span className={`text-xs font-bold uppercase tracking-widest ${isPopular ? 'text-teal-400' : 'text-white/30'}`}>
+						{tier.tierName}
+					</span>
+					{isPopular && (
+						<span className="text-[10px] font-bold uppercase tracking-wider bg-teal-500/15 text-teal-400 px-2 py-0.5 rounded-full border border-teal-500/25">
+							Most Popular
+						</span>
 					)}
-				</AnimatePresence>
+				</div>
+
+				{/* Material */}
+				<h3 className="font-display text-lg font-bold text-white mb-0.5">{tier.materialName}</h3>
+				<p className="text-xs text-white/30 mb-5">{tier.warranty}</p>
+
+				{/* Price */}
+				<div className="mb-5">
+					<div className="flex items-baseline gap-1">
+						<span className={`font-display text-4xl font-extrabold ${isPopular ? 'text-gradient-teal' : 'text-white'}`}>
+							${tier.totalCost.toLocaleString()}
+						</span>
+					</div>
+					<div className="text-xs text-white/25 mt-1">
+						${tier.costPerSqFt.toFixed(2)} / sq ft
+					</div>
+				</div>
+
+				{/* Monthly */}
+				<div className={`rounded-lg p-3 mb-5 ${isPopular ? 'bg-teal-500/[0.08] border border-teal-500/15' : 'bg-white/[0.03] border border-white/[0.04]'}`}>
+					<div className="flex items-baseline gap-1">
+						<span className={`font-display text-xl font-bold ${isPopular ? 'text-teal-300' : 'text-white/70'}`}>
+							${tier.monthlyPayment}
+						</span>
+						<span className="text-xs text-white/25">/mo</span>
+					</div>
+					<div className="text-[10px] text-white/20">60 months · 6.9% APR</div>
+				</div>
+
+				{/* Breakdown */}
+				<div className="space-y-2 mb-6">
+					{[
+						{ label: 'Materials', value: tier.breakdown.materials },
+						{ label: 'Labor', value: tier.breakdown.labor },
+						{ label: 'Removal', value: tier.breakdown.removal },
+						{ label: 'Permits & Cleanup', value: tier.breakdown.permits + tier.breakdown.dumpster },
+					].map((row) => (
+						<div key={row.label} className="flex justify-between items-center">
+							<span className="text-xs text-white/30">{row.label}</span>
+							<span className="text-xs text-white/50 font-medium">${row.value.toLocaleString()}</span>
+						</div>
+					))}
+				</div>
+
+				{/* CTA */}
+				<button
+					onClick={onSelect}
+					className={`w-full py-3 rounded-xl text-sm font-bold transition-all ${
+						isPopular
+							? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white hover:from-teal-400 hover:to-cyan-400 shadow-lg shadow-teal-500/20'
+							: 'bg-white/[0.06] text-white/70 hover:bg-white/[0.1] hover:text-white border border-white/[0.06]'
+					}`}
+				>
+					Select {tier.tierName}
+				</button>
 			</div>
 		</motion.div>
 	);

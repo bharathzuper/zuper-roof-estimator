@@ -14,6 +14,8 @@ export const MOCK_ADDRESSES: RoofData[] = [
 				id: 'A',
 				label: 'Main Roof',
 				areaSqFt: 1800,
+				pitch: '6/12',
+				azimuth: 'South',
 				polygon: [
 					{ x: 15, y: 20 },
 					{ x: 65, y: 15 },
@@ -29,6 +31,8 @@ export const MOCK_ADDRESSES: RoofData[] = [
 				id: 'B',
 				label: 'Garage Wing',
 				areaSqFt: 1050,
+				pitch: '5/12',
+				azimuth: 'East',
 				polygon: [
 					{ x: 55, y: 58 },
 					{ x: 88, y: 55 },
@@ -60,6 +64,8 @@ export const MOCK_ADDRESSES: RoofData[] = [
 				id: 'A',
 				label: 'Main Roof',
 				areaSqFt: 2100,
+				pitch: '7/12',
+				azimuth: 'South',
 				polygon: [
 					{ x: 10, y: 18 },
 					{ x: 75, y: 12 },
@@ -75,6 +81,8 @@ export const MOCK_ADDRESSES: RoofData[] = [
 				id: 'B',
 				label: 'East Wing',
 				areaSqFt: 700,
+				pitch: '6/12',
+				azimuth: 'East',
 				polygon: [
 					{ x: 62, y: 62 },
 					{ x: 90, y: 60 },
@@ -90,6 +98,8 @@ export const MOCK_ADDRESSES: RoofData[] = [
 				id: 'C',
 				label: 'Porch',
 				areaSqFt: 400,
+				pitch: '4/12',
+				azimuth: 'West',
 				polygon: [
 					{ x: 12, y: 68 },
 					{ x: 40, y: 66 },
@@ -118,6 +128,8 @@ export const MOCK_ADDRESSES: RoofData[] = [
 				id: 'A',
 				label: 'Main Roof',
 				areaSqFt: 1400,
+				pitch: '5/12',
+				azimuth: 'South',
 				polygon: [
 					{ x: 12, y: 22 },
 					{ x: 72, y: 18 },
@@ -133,6 +145,8 @@ export const MOCK_ADDRESSES: RoofData[] = [
 				id: 'B',
 				label: 'Rear Section',
 				areaSqFt: 700,
+				pitch: '5/12',
+				azimuth: 'North',
 				polygon: [
 					{ x: 30, y: 62 },
 					{ x: 78, y: 60 },
@@ -164,6 +178,8 @@ export const MOCK_ADDRESSES: RoofData[] = [
 				id: 'A',
 				label: 'North Wing',
 				areaSqFt: 1500,
+				pitch: '8/12',
+				azimuth: 'North',
 				polygon: [
 					{ x: 8, y: 15 },
 					{ x: 50, y: 12 },
@@ -179,6 +195,8 @@ export const MOCK_ADDRESSES: RoofData[] = [
 				id: 'B',
 				label: 'South Wing',
 				areaSqFt: 1300,
+				pitch: '8/12',
+				azimuth: 'South',
 				polygon: [
 					{ x: 50, y: 15 },
 					{ x: 92, y: 12 },
@@ -194,6 +212,8 @@ export const MOCK_ADDRESSES: RoofData[] = [
 				id: 'C',
 				label: 'Center',
 				areaSqFt: 600,
+				pitch: '7/12',
+				azimuth: 'East',
 				polygon: [
 					{ x: 30, y: 52 },
 					{ x: 70, y: 50 },
@@ -206,6 +226,8 @@ export const MOCK_ADDRESSES: RoofData[] = [
 				id: 'D',
 				label: 'Garage',
 				areaSqFt: 400,
+				pitch: '6/12',
+				azimuth: 'West',
 				polygon: [
 					{ x: 60, y: 74 },
 					{ x: 90, y: 72 },
@@ -229,17 +251,29 @@ export const MOCK_ADDRESSES: RoofData[] = [
 export const MATERIAL_OPTIONS: MaterialOption[] = [
 	{
 		id: 'asphalt',
+		name: 'Asphalt Shingles',
 		label: 'Asphalt Shingles',
+		description: 'Most popular choice. Affordable, reliable, and available in many styles.',
+		lifespan: '20–30 years',
+		priceRange: '$3–7/sq ft',
 		imageUrl: 'https://images.unsplash.com/photo-1632759145351-1d592919f522?w=400&q=80',
 	},
 	{
 		id: 'metal',
+		name: 'Metal Roofing',
 		label: 'Metal Roofing',
+		description: 'Extremely durable and energy-efficient. Great for all climates.',
+		lifespan: '40–70 years',
+		priceRange: '$5–14/sq ft',
 		imageUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&q=80',
 	},
 	{
 		id: 'tile',
+		name: 'Tile Roofing',
 		label: 'Tile Roofing',
+		description: 'Premium look with exceptional longevity. Classic Mediterranean style.',
+		lifespan: '50–100 years',
+		priceRange: '$6–16/sq ft',
 		imageUrl: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&q=80',
 	},
 ];
@@ -256,6 +290,6 @@ export function filterAddresses(query: string): RoofData[] {
 		(a) =>
 			a.address.toLowerCase().includes(q) ||
 			a.city.toLowerCase().includes(q) ||
-			a.zip.includes(q)
+			a.zip.includes(q),
 	);
 }

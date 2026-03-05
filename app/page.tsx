@@ -1,106 +1,96 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { RoofData, DesiredMaterial, ProjectTimeline } from '@/lib/types';
+import { motion, AnimatePresence } from 'framer-motion';
+import { RoofData, DesiredMaterial, ProjectTimeline, TierEstimate } from '@/lib/types';
 import WizardProgress from '@/components/WizardProgress';
 import Step1Welcome from '@/components/Step1Welcome';
 import Step3Analysis from '@/components/Step3Analysis';
 import Step4Estimate from '@/components/Step4Estimate';
 import Step5LeadCapture from '@/components/Step5LeadCapture';
 
-type Step = 'hero' | 'analysis' | 'estimate' | 'lead';
+type WizardStep = 'hero' | 'analysis' | 'estimate' | 'lead';
 
-const stepOrder: Step[] = ['hero', 'analysis', 'estimate', 'lead'];
-
-const wizardStepMap: Record<Step, number> = {
+const stepToNumber: Record<WizardStep, number> = {
 	hero: 1,
 	analysis: 2,
 	estimate: 3,
 	lead: 4,
 };
 
-const slideVariants = {
-	enter: (direction: number) => ({
-		x: direction > 0 ? 300 : -300,
-		opacity: 0,
-	}),
-	center: { x: 0, opacity: 1 },
-	exit: (direction: number) => ({
-		x: direction > 0 ? -300 : 300,
-		opacity: 0,
-	}),
-};
-
 export default function Home() {
-	const [step, setStep] = useState<Step>('hero');
-	const [direction, setDirection] = useState(1);
+	const [step, setStep] = useState<WizardStep>('hero');
 	const [roofData, setRoofData] = useState<RoofData | null>(null);
 	const [desiredMaterial, setDesiredMaterial] = useState<DesiredMaterial>('asphalt');
-	const [timeline, setTimeline] = useState<ProjectTimeline>('no-timeline');
+	const [selectedTier, setSelectedTier] = useState<TierEstimate | null>(null);
 
-	const goTo = useCallback(
-		(next: Step) => {
-			const curIdx = stepOrder.indexOf(step);
-			const nextIdx = stepOrder.indexOf(next);
-			setDirection(nextIdx > curIdx ? 1 : -1);
-			setStep(next);
-		},
-		[step]
-	);
+	const handleAddressSelected = useCallback((data: RoofData) => {
+		setRoofData(data);
+		setStep('analysis');
+	}, []);
 
-	const handleAddressSelected = useCallback(
-		(data: RoofData) => {
-			setRoofData(data);
-			goTo('analysis');
-		},
-		[goTo]
-	);
+	const handleAnalysisContinue = useCallback((material: DesiredMaterial, _timeline: ProjectTimeline) => {
+		setDesiredMaterial(material);
+		setStep('estimate');
+	}, []);
+
+	const handleTierSelected = useCallback((tier: TierEstimate) => {
+		setSelectedTier(tier);
+		setStep('lead');
+	}, []);
 
 	return (
-		<main className="min-h-screen relative">
-			{step !== 'hero' && (
-				<WizardProgress currentStep={wizardStepMap[step] as 1 | 2 | 3 | 4 | 5} />
-			)}
+		<main className="relative">
+			<WizardProgress currentStep={stepToNumber[step]} />
 
-			<AnimatePresence mode="wait" custom={direction}>
-				<motion.div
-					key={step}
-					custom={direction}
-					variants={slideVariants}
-					initial="enter"
-					animate="center"
-					exit="exit"
-					transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-					className="min-h-screen"
-				>
-					{step === 'hero' && (
+			<AnimatePresence mode="wait">
+				{step === 'hero' && (
+					<motion.div
+						key="hero"
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						exit={{ opacity: 0 }}
+						transition={{ duration: 0.4 }}
+					>
 						<Step1Welcome onAddressSelected={handleAddressSelected} />
-					)}
+					</motion.div>
+				)}
 
-					{step === 'analysis' && roofData && (
-						<Step3Analysis
-							roofData={roofData}
-							desiredMaterial={desiredMaterial}
-							timeline={timeline}
-							onMaterialChange={setDesiredMaterial}
-							onTimelineChange={setTimeline}
-							onContinue={() => goTo('estimate')}
-							onBack={() => goTo('hero')}
-						/>
-					)}
+				{step === 'analysis' && roofData && (
+					<motion.div
+						key="analysis"
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						exit={{ opacity: 0 }}
+						transition={{ duration: 0.4 }}
+					>
+						<Step3Analysis roofData={roofData} onContinue={handleAnalysisContinue} />
+					</motion.div>
+				)}
 
-					{step === 'estimate' && roofData && (
-						<Step4Estimate
-							roofData={roofData}
-							desiredMaterial={desiredMaterial}
-							onGetQuote={() => goTo('lead')}
-							onBack={() => goTo('analysis')}
-						/>
-					)}
+				{step === 'estimate' && roofData && (
+					<motion.div
+						key="estimate"
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						exit={{ opacity: 0 }}
+						transition={{ duration: 0.4 }}
+					>
+						<Step4Estimate roofData={roofData} desiredMaterial={desiredMaterial} onSelectTier={handleTierSelected} />
+					</motion.div>
+				)}
 
-					{step === 'lead' && <Step5LeadCapture onBack={() => goTo('estimate')} />}
-				</motion.div>
+				{step === 'lead' && roofData && selectedTier && (
+					<motion.div
+						key="lead"
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						exit={{ opacity: 0 }}
+						transition={{ duration: 0.4 }}
+					>
+						<Step5LeadCapture selectedTier={selectedTier} roofData={roofData} />
+					</motion.div>
+				)}
 			</AnimatePresence>
 		</main>
 	);

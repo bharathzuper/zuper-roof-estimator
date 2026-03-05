@@ -1,4 +1,4 @@
-import { TierConfig, TierEstimate, PricingBreakdown } from './types';
+import { TierConfig, TierEstimate } from './types';
 
 const TIER_CONFIGS: Record<string, TierConfig[]> = {
 	asphalt: [
@@ -9,12 +9,7 @@ const TIER_CONFIGS: Record<string, TierConfig[]> = {
 			materialName: '3-Tab Shingles',
 			materialImage: 'https://images.unsplash.com/photo-1632759145351-1d592919f522?w=400&q=80',
 			warranty: '25-year limited',
-			features: [
-				'Standard felt underlayment',
-				'Basic ridge ventilation',
-				'Standard drip edge',
-				'5-year workmanship warranty',
-			],
+			features: ['Standard underlayment', 'Basic ridge ventilation', 'Standard drip edge', '5-year workmanship'],
 			ratePerSqFt: 3.25,
 		},
 		{
@@ -24,13 +19,7 @@ const TIER_CONFIGS: Record<string, TierConfig[]> = {
 			materialName: 'GAF Timberline HDZ',
 			materialImage: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&q=80',
 			warranty: 'Lifetime limited',
-			features: [
-				'Synthetic underlayment',
-				'Enhanced ridge ventilation',
-				'Ice & water shield at eaves',
-				'Drip edge & starter strip',
-				'10-year workmanship warranty',
-			],
+			features: ['Synthetic underlayment', 'Enhanced ventilation', 'Ice & water shield', '10-year workmanship'],
 			ratePerSqFt: 4.75,
 		},
 		{
@@ -40,14 +29,7 @@ const TIER_CONFIGS: Record<string, TierConfig[]> = {
 			materialName: 'GAF Grand Canyon',
 			materialImage: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&q=80',
 			warranty: 'Lifetime + Golden Pledge',
-			features: [
-				'Premium synthetic underlayment',
-				'Full ventilation system',
-				'Ice & water shield full deck',
-				'All premium accessories',
-				'25-year workmanship warranty',
-				'Golden Pledge coverage',
-			],
+			features: ['Premium underlayment', 'Full ventilation system', 'Full-deck ice shield', '25-year workmanship'],
 			ratePerSqFt: 7.0,
 		},
 	],
@@ -59,7 +41,7 @@ const TIER_CONFIGS: Record<string, TierConfig[]> = {
 			materialName: 'Corrugated Metal',
 			materialImage: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&q=80',
 			warranty: '30-year limited',
-			features: ['Standard underlayment', 'Basic trim package', '5-year workmanship warranty'],
+			features: ['Standard underlayment', 'Basic trim package', '5-year workmanship'],
 			ratePerSqFt: 5.5,
 		},
 		{
@@ -69,12 +51,7 @@ const TIER_CONFIGS: Record<string, TierConfig[]> = {
 			materialName: 'Standing Seam Metal',
 			materialImage: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&q=80',
 			warranty: '40-year limited',
-			features: [
-				'Synthetic underlayment',
-				'Premium trim package',
-				'Snow guards included',
-				'15-year workmanship warranty',
-			],
+			features: ['Synthetic underlayment', 'Premium trim', 'Snow guards included', '15-year workmanship'],
 			ratePerSqFt: 8.5,
 		},
 		{
@@ -84,12 +61,7 @@ const TIER_CONFIGS: Record<string, TierConfig[]> = {
 			materialName: 'Copper Standing Seam',
 			materialImage: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&q=80',
 			warranty: 'Lifetime',
-			features: [
-				'Premium underlayment',
-				'Custom copper trim',
-				'Snow guards & ice melt',
-				'Lifetime workmanship warranty',
-			],
+			features: ['Premium underlayment', 'Custom copper trim', 'Snow guards & ice melt', 'Lifetime workmanship'],
 			ratePerSqFt: 14.0,
 		},
 	],
@@ -101,7 +73,7 @@ const TIER_CONFIGS: Record<string, TierConfig[]> = {
 			materialName: 'Concrete Tile',
 			materialImage: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&q=80',
 			warranty: '30-year limited',
-			features: ['Standard underlayment', 'Basic flashing', '5-year workmanship warranty'],
+			features: ['Standard underlayment', 'Basic flashing', '5-year workmanship'],
 			ratePerSqFt: 6.0,
 		},
 		{
@@ -111,12 +83,7 @@ const TIER_CONFIGS: Record<string, TierConfig[]> = {
 			materialName: 'Clay Barrel Tile',
 			materialImage: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&q=80',
 			warranty: '50-year limited',
-			features: [
-				'Synthetic underlayment',
-				'Premium flashing',
-				'Ridge & hip tiles included',
-				'10-year workmanship warranty',
-			],
+			features: ['Synthetic underlayment', 'Premium flashing', 'Ridge & hip tiles', '10-year workmanship'],
 			ratePerSqFt: 10.0,
 		},
 		{
@@ -126,12 +93,7 @@ const TIER_CONFIGS: Record<string, TierConfig[]> = {
 			materialName: 'Slate Tile',
 			materialImage: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&q=80',
 			warranty: 'Lifetime',
-			features: [
-				'Premium underlayment system',
-				'Copper flashing',
-				'Custom ridge work',
-				'Lifetime workmanship warranty',
-			],
+			features: ['Premium underlayment system', 'Copper flashing', 'Custom ridge work', 'Lifetime workmanship'],
 			ratePerSqFt: 16.0,
 		},
 	],
@@ -139,42 +101,36 @@ const TIER_CONFIGS: Record<string, TierConfig[]> = {
 
 function getPitchMultiplier(pitch: string): number {
 	const pitchNum = parseInt(pitch.split('/')[0]);
+	if (isNaN(pitchNum)) return 1;
 	return 1 + (pitchNum - 4) * 0.035;
-}
-
-function calculateBreakdown(totalCost: number): PricingBreakdown {
-	return {
-		materials: Math.round(totalCost * 0.45),
-		labor: Math.round(totalCost * 0.35),
-		tearOff: Math.round(totalCost * 0.12),
-		permits: Math.round(totalCost * 0.08),
-		total: Math.round(totalCost),
-	};
-}
-
-function calculateMonthlyPayments(total: number): Record<number, number> {
-	return {
-		12: Math.round(total / 12),
-		24: Math.round(total / 24),
-		36: Math.round(total / 36),
-		60: Math.round((total * 1.059) / 60),
-	};
 }
 
 export function calculateEstimates(
 	roofAreaSqFt: number,
 	pitch: string,
-	material: string
+	material: string,
 ): TierEstimate[] {
 	const pitchMult = getPitchMultiplier(pitch);
 	const tiers = TIER_CONFIGS[material] || TIER_CONFIGS.asphalt;
 
 	return tiers.map((tier) => {
-		const totalCost = roofAreaSqFt * tier.ratePerSqFt * pitchMult;
+		const totalCost = Math.round(roofAreaSqFt * tier.ratePerSqFt * pitchMult);
+		const monthly60 = Math.round((totalCost * 1.069) / 60);
+
 		return {
-			tier,
-			breakdown: calculateBreakdown(totalCost),
-			monthlyPayments: calculateMonthlyPayments(Math.round(totalCost)),
+			tierName: tier.label,
+			materialName: tier.materialName,
+			warranty: tier.warranty,
+			totalCost,
+			costPerSqFt: Math.round((totalCost / roofAreaSqFt) * 100) / 100,
+			monthlyPayment: monthly60,
+			breakdown: {
+				materials: Math.round(totalCost * 0.40),
+				labor: Math.round(totalCost * 0.32),
+				removal: Math.round(totalCost * 0.12),
+				permits: Math.round(totalCost * 0.06),
+				dumpster: Math.round(totalCost * 0.10),
+			},
 		};
 	});
 }

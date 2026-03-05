@@ -1,35 +1,96 @@
 @import 'tailwindcss';
 
 @theme inline {
-	--font-sans: var(--font-inter);
-	--color-brand: #1a1a2e;
-	--color-brand-light: #16213e;
-	--color-accent: #3b82f6;
-	--color-accent-light: #60a5fa;
-	--color-success: #10b981;
-	--color-surface: #ffffff;
-	--color-surface-alt: #f8fafc;
+	--font-display: var(--font-syne);
+	--font-body: var(--font-dm);
+	--color-teal: #2dd4bf;
+	--color-teal-light: #5eead4;
+	--color-surface: #0c0f1a;
+	--color-surface-raised: #111827;
+	--color-surface-overlay: #1a1f35;
 }
 
 * {
 	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
 }
 
 body {
-	font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
-	background: #0f172a;
-	color: #f8fafc;
+	font-family: var(--font-body), system-ui, sans-serif;
+	background: #0c0f1a;
+	color: #e2e8f0;
 	overflow-x: hidden;
+	-webkit-font-smoothing: antialiased;
 }
 
+h1, h2, h3, .font-display {
+	font-family: var(--font-display), system-ui, sans-serif;
+}
+
+/* Noise overlay */
+.noise::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+	opacity: 0.03;
+	pointer-events: none;
+	z-index: 1;
+}
+
+/* Map vignette */
+.vignette::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: radial-gradient(
+		ellipse at center,
+		transparent 30%,
+		rgba(12, 15, 26, 0.4) 70%,
+		rgba(12, 15, 26, 0.85) 100%
+	);
+	pointer-events: none;
+	z-index: 2;
+}
+
+/* Gradient text */
+.text-gradient-teal {
+	background: linear-gradient(135deg, #2dd4bf 0%, #22d3ee 50%, #38bdf8 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+.text-gradient-white {
+	background: linear-gradient(180deg, #ffffff 0%, #94a3b8 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+/* Glass card */
+.glass-card {
+	background: rgba(255, 255, 255, 0.95);
+	backdrop-filter: blur(24px);
+	-webkit-backdrop-filter: blur(24px);
+	box-shadow:
+		0 8px 32px rgba(0, 0, 0, 0.12),
+		0 2px 8px rgba(0, 0, 0, 0.06),
+		inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.glass-dark {
+	background: rgba(17, 24, 39, 0.85);
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+	border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Animations */
 @keyframes scan-line {
 	0% { transform: translateY(-100%); }
-	100% { transform: translateY(100%); }
-}
-
-@keyframes pulse-glow {
-	0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.2); }
-	50% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.4); }
+	100% { transform: translateY(200%); }
 }
 
 @keyframes draw-path {
@@ -37,22 +98,9 @@ body {
 	100% { stroke-dashoffset: 0; }
 }
 
-@keyframes shimmer {
-	0% { background-position: -200% 0; }
-	100% { background-position: 200% 0; }
-}
-
-@keyframes float {
-	0%, 100% { transform: translateY(0); }
-	50% { transform: translateY(-6px); }
-}
-
-.animate-scan-line {
-	animation: scan-line 2s ease-in-out infinite;
-}
-
-.animate-pulse-glow {
-	animation: pulse-glow 2s ease-in-out infinite;
+@keyframes pulse-ring {
+	0% { transform: scale(1); opacity: 0.6; }
+	100% { transform: scale(2.5); opacity: 0; }
 }
 
 .animate-draw-path {
@@ -61,37 +109,11 @@ body {
 	animation: draw-path 1.5s ease forwards;
 }
 
-.animate-shimmer {
-	background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-	background-size: 200% 100%;
-	animation: shimmer 2s infinite;
-}
-
-.animate-float {
-	animation: float 3s ease-in-out infinite;
-}
-
-.glass {
-	background: rgba(255, 255, 255, 0.05);
-	backdrop-filter: blur(16px);
-	-webkit-backdrop-filter: blur(16px);
-	border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.glass-light {
-	background: rgba(255, 255, 255, 0.8);
-	backdrop-filter: blur(16px);
-	-webkit-backdrop-filter: blur(16px);
-	border: 1px solid rgba(255, 255, 255, 0.5);
-}
-
-.gradient-text {
-	background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%);
-	-webkit-background-clip: text;
-	-webkit-text-fill-color: transparent;
-	background-clip: text;
-}
-
+/* Input styling */
 input::placeholder {
-	color: #64748b;
+	color: #9ca3af;
+}
+
+input:focus {
+	outline: none;
 }

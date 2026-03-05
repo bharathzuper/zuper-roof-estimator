@@ -1,16 +1,23 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Syne, DM_Sans } from 'next/font/google';
 import './globals.css';
 
-const inter = Inter({
-	variable: '--font-inter',
+const syne = Syne({
+	variable: '--font-syne',
 	subsets: ['latin'],
+	display: 'swap',
+});
+
+const dmSans = DM_Sans({
+	variable: '--font-dm',
+	subsets: ['latin'],
+	display: 'swap',
 });
 
 export const metadata: Metadata = {
-	title: 'Instant Roof Estimate | AI-Powered | Acme Roofing Co.',
+	title: 'AI Roof Reports in 30 Seconds | Zuper Roofing',
 	description:
-		'Get your free AI-powered roof estimate in 60 seconds. No site visit needed. Satellite imagery measures your roof instantly.',
+		'Search any address — get roof area, pitch, and cost estimates instantly. AI-powered satellite analysis.',
 };
 
 export default function RootLayout({
@@ -20,7 +27,7 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
-			<body className={`${inter.variable} antialiased`}>{children}</body>
+			<body className={`${syne.variable} ${dmSans.variable} antialiased`}>{children}</body>
 		</html>
 	);
 }

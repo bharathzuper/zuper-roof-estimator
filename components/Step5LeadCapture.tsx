@@ -2,143 +2,219 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { LeadFormData, TierEstimate, RoofData } from '@/lib/types';
 
-type ContactMethod = 'call' | 'text' | 'email';
-type BestTime = 'morning' | 'afternoon' | 'evening';
+interface Step5Props {
+	selectedTier: TierEstimate;
+	roofData: RoofData;
+}
 
-export default function Step5LeadCapture({ onBack }: { onBack: () => void }) {
+export default function Step5LeadCapture({ selectedTier, roofData }: Step5Props) {
 	const [submitted, setSubmitted] = useState(false);
-	const [firstName, setFirstName] = useState('');
-	const [lastName, setLastName] = useState('');
-	const [email, setEmail] = useState('');
-	const [phone, setPhone] = useState('');
-	const [contactMethod, setContactMethod] = useState<ContactMethod>('call');
-	const [bestTime, setBestTime] = useState<BestTime>('morning');
-	const [agreedTerms, setAgreedTerms] = useState(false);
+	const [form, setForm] = useState<LeadFormData>({
+		firstName: '',
+		lastName: '',
+		email: '',
+		phone: '',
+		preferredContact: 'email',
+		notes: '',
+	});
 
-	const canSubmit = firstName && email && phone && agreedTerms;
+	const isValid = form.firstName && form.lastName && form.email && form.phone;
+
+	const handleSubmit = (e: React.FormEvent) => {
+		e.preventDefault();
+		if (isValid) setSubmitted(true);
+	};
 
 	return (
-		<div className="min-h-screen flex items-center justify-center pt-16 pb-8 px-4 bg-gradient-to-b from-slate-900 to-slate-950">
-			<div className="w-full max-w-lg">
+		<div className="min-h-screen bg-surface relative overflow-hidden">
+			{/* Ambient */}
+			<div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-teal-500/[0.04] blur-[140px] rounded-full pointer-events-none" />
+
+			<div className="relative z-10 max-w-2xl mx-auto px-4 py-12 sm:py-16">
 				<AnimatePresence mode="wait">
 					{!submitted ? (
-						<motion.div key="form" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }}>
-							<motion.button
-								onClick={onBack}
-								className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-300 mb-6 transition-colors"
-								initial={{ opacity: 0 }}
-								animate={{ opacity: 1 }}
-							>
-								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-									<path d="M19 12H5M12 19l-7-7 7-7" />
-								</svg>
-								Back to estimate
-							</motion.button>
-
-							<div className="bg-white/[0.03] border border-white/5 rounded-2xl p-8">
-								<h2 className="text-2xl font-bold text-white mb-1">Where should we send your estimate?</h2>
-								<p className="text-sm text-slate-500 mb-8">A roofing specialist will prepare your detailed quote and schedule a free inspection.</p>
-
-								<div className="space-y-4">
-									<div className="grid grid-cols-2 gap-3">
-										<div>
-											<label className="block text-xs font-medium text-slate-400 mb-1">Name <span className="text-red-400">*</span></label>
-											<input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Enter your full name"
-												className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-600 focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all" />
-										</div>
-										<div>
-											<label className="block text-xs font-medium text-slate-400 mb-1">Email <span className="text-red-400">*</span></label>
-											<input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter your email"
-												className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-600 focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all" />
-										</div>
-									</div>
-
-									<div>
-										<label className="block text-xs font-medium text-slate-400 mb-1">Phone <span className="text-red-400">*</span></label>
-										<input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Enter your phone number"
-											className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-600 focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all" />
-									</div>
-
-									<div>
-										<label className="block text-xs font-medium text-slate-400 mb-2">Preferred contact method</label>
-										<div className="flex gap-2">
-											{([
-												{ id: 'call' as ContactMethod, label: 'Call' },
-												{ id: 'text' as ContactMethod, label: 'Text' },
-												{ id: 'email' as ContactMethod, label: 'Email' },
-											]).map((opt) => (
-												<button key={opt.id} onClick={() => setContactMethod(opt.id)}
-													className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
-														contactMethod === opt.id
-															? 'bg-blue-500/10 border-2 border-blue-500/50 text-blue-400'
-															: 'bg-white/[0.03] border border-white/5 text-slate-500 hover:bg-white/[0.06]'
-													}`}>{opt.label}</button>
-											))}
-										</div>
-									</div>
-
-									<div>
-										<label className="block text-xs font-medium text-slate-400 mb-2">Best time to reach you</label>
-										<div className="flex gap-2">
-											{([
-												{ id: 'morning' as BestTime, label: 'Morning', sub: '8am–12pm' },
-												{ id: 'afternoon' as BestTime, label: 'Afternoon', sub: '12–5pm' },
-												{ id: 'evening' as BestTime, label: 'Evening', sub: '5–8pm' },
-											]).map((opt) => (
-												<button key={opt.id} onClick={() => setBestTime(opt.id)}
-													className={`flex-1 py-2.5 rounded-xl transition-all ${
-														bestTime === opt.id
-															? 'bg-blue-500/10 border-2 border-blue-500/50'
-															: 'bg-white/[0.03] border border-white/5 hover:bg-white/[0.06]'
-													}`}>
-													<div className={`text-sm font-medium ${bestTime === opt.id ? 'text-blue-400' : 'text-slate-400'}`}>{opt.label}</div>
-													<div className="text-[10px] text-slate-600">{opt.sub}</div>
-												</button>
-											))}
-										</div>
-									</div>
-
-									<label className="flex items-start gap-3 cursor-pointer pt-2">
-										<input type="checkbox" checked={agreedTerms} onChange={(e) => setAgreedTerms(e.target.checked)}
-											className="mt-0.5 w-4 h-4 text-blue-600 bg-white/5 border-white/20 rounded focus:ring-blue-500" />
-										<span className="text-xs text-slate-500 leading-relaxed">
-											I agree to the <span className="text-blue-400">Terms of Service</span> and <span className="text-blue-400">Privacy Policy</span>.
-											By submitting, I consent to being contacted about my roofing project.
-										</span>
-									</label>
-
-									<button onClick={() => canSubmit && setSubmitted(true)} disabled={!canSubmit}
-										className={`w-full py-4 text-base font-semibold rounded-xl transition-all mt-2 ${
-											canSubmit
-												? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-600/20'
-												: 'bg-white/5 text-slate-600 cursor-not-allowed'
-										}`}>Get my estimate</button>
+						<motion.div key="form" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
+							{/* Summary banner */}
+							<div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 mb-8 flex items-center gap-4">
+								<div className="w-12 h-12 rounded-lg bg-teal-500/10 flex items-center justify-center shrink-0">
+									<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" strokeWidth="2">
+										<path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
+									</svg>
+								</div>
+								<div className="flex-1 min-w-0">
+									<div className="text-sm font-semibold text-white">{selectedTier.tierName} · {selectedTier.materialName}</div>
+									<div className="text-xs text-white/30">{roofData.address} · {roofData.roofAreaSqFt.toLocaleString()} sq ft</div>
+								</div>
+								<div className="text-right shrink-0">
+									<div className="font-display text-lg font-bold text-teal-400">${selectedTier.totalCost.toLocaleString()}</div>
+									<div className="text-[10px] text-white/25">${selectedTier.monthlyPayment}/mo</div>
 								</div>
 							</div>
+
+							{/* Header */}
+							<div className="text-center mb-8">
+								<h2 className="font-display text-2xl sm:text-3xl font-bold text-white mb-2">Get Your Detailed Quote</h2>
+								<p className="text-sm text-white/40">Connect with a verified contractor in your area.</p>
+							</div>
+
+							{/* Form */}
+							<form onSubmit={handleSubmit} className="space-y-4">
+								<div className="grid grid-cols-2 gap-3">
+									<div>
+										<label className="block text-xs font-medium text-white/40 mb-1.5">First Name</label>
+										<input
+											value={form.firstName}
+											onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+											className="w-full px-3 py-2.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-sm text-white focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/20 transition"
+											placeholder="John"
+										/>
+									</div>
+									<div>
+										<label className="block text-xs font-medium text-white/40 mb-1.5">Last Name</label>
+										<input
+											value={form.lastName}
+											onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+											className="w-full px-3 py-2.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-sm text-white focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/20 transition"
+											placeholder="Smith"
+										/>
+									</div>
+								</div>
+								<div>
+									<label className="block text-xs font-medium text-white/40 mb-1.5">Email</label>
+									<input
+										type="email"
+										value={form.email}
+										onChange={(e) => setForm({ ...form, email: e.target.value })}
+										className="w-full px-3 py-2.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-sm text-white focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/20 transition"
+										placeholder="john@email.com"
+									/>
+								</div>
+								<div>
+									<label className="block text-xs font-medium text-white/40 mb-1.5">Phone</label>
+									<input
+										type="tel"
+										value={form.phone}
+										onChange={(e) => setForm({ ...form, phone: e.target.value })}
+										className="w-full px-3 py-2.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-sm text-white focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/20 transition"
+										placeholder="(555) 123-4567"
+									/>
+								</div>
+
+								{/* Contact preference */}
+								<div>
+									<label className="block text-xs font-medium text-white/40 mb-2">Preferred Contact</label>
+									<div className="flex gap-3">
+										{(['email', 'call', 'text'] as const).map((method) => (
+											<button
+												key={method}
+												type="button"
+												onClick={() => setForm({ ...form, preferredContact: method })}
+												className={`flex-1 py-2 rounded-lg text-xs font-medium transition-all capitalize ${
+													form.preferredContact === method
+														? 'bg-teal-500/15 text-teal-400 border border-teal-500/30'
+														: 'bg-white/[0.03] text-white/30 border border-white/[0.06] hover:border-white/10'
+												}`}
+											>
+												{method}
+											</button>
+										))}
+									</div>
+								</div>
+
+								{/* Notes */}
+								<div>
+									<label className="block text-xs font-medium text-white/40 mb-1.5">Notes <span className="text-white/20">(optional)</span></label>
+									<textarea
+										value={form.notes}
+										onChange={(e) => setForm({ ...form, notes: e.target.value })}
+										rows={3}
+										className="w-full px-3 py-2.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-sm text-white focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/20 transition resize-none"
+										placeholder="Any details about your project..."
+									/>
+								</div>
+
+								<button
+									type="submit"
+									disabled={!isValid}
+									className="w-full py-4 rounded-xl font-display font-bold text-sm uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed bg-gradient-to-r from-teal-500 to-cyan-500 text-white hover:from-teal-400 hover:to-cyan-400 shadow-lg shadow-teal-500/20"
+								>
+									Get My Detailed Quote
+								</button>
+
+								<p className="text-center text-[10px] text-white/20 mt-2">
+									By submitting, you agree to our Terms. We&apos;ll connect you with a local contractor.
+								</p>
+							</form>
 						</motion.div>
 					) : (
-						<motion.div key="success" className="text-center py-20" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: 'spring', stiffness: 200 }}>
-							<motion.div className="w-20 h-20 bg-emerald-500/15 rounded-full flex items-center justify-center mx-auto mb-6"
-								initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: 'spring', stiffness: 300 }}>
-								<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+						<motion.div
+							key="success"
+							className="text-center py-20"
+							initial={{ opacity: 0, scale: 0.95 }}
+							animate={{ opacity: 1, scale: 1 }}
+							transition={{ type: 'spring', stiffness: 120 }}
+						>
+							{/* Success animation */}
+							<motion.div
+								className="w-20 h-20 rounded-full bg-teal-500/15 flex items-center justify-center mx-auto mb-6"
+								initial={{ scale: 0 }}
+								animate={{ scale: 1 }}
+								transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+							>
+								<motion.svg
+									width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" strokeWidth="2.5"
+									initial={{ pathLength: 0 }}
+									animate={{ pathLength: 1 }}
+									transition={{ delay: 0.4, duration: 0.5 }}
+								>
+									<polyline points="20 6 9 17 4 12" />
+								</motion.svg>
 							</motion.div>
-							<motion.h2 className="text-3xl font-bold text-white mb-3" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-								Thank you, {firstName}!
-							</motion.h2>
-							<motion.p className="text-slate-400 max-w-sm mx-auto mb-8" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
-								A roofing specialist will contact you within 2 hours to discuss your project and schedule a free inspection.
-							</motion.p>
-							<motion.div className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-full text-sm font-medium"
-								initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
-								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-									<path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" />
-								</svg>
-								Expect a call within 2 hours
-							</motion.div>
-							<motion.div className="mt-12 text-xs text-slate-700 flex items-center justify-center gap-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
-								<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" /></svg>
-								Powered by Zuper
+
+							<h2 className="font-display text-3xl font-bold text-white mb-3">You&apos;re All Set!</h2>
+							<p className="text-white/40 text-sm max-w-sm mx-auto mb-8">
+								A verified contractor will reach out within 24 hours with a detailed quote for your {selectedTier.materialName.toLowerCase()} roof.
+							</p>
+
+							{/* Summary card */}
+							<div className="inline-block rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 text-left">
+								<div className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
+									<div>
+										<div className="text-[10px] text-white/25 uppercase tracking-wider mb-0.5">Tier</div>
+										<div className="text-white font-medium">{selectedTier.tierName}</div>
+									</div>
+									<div>
+										<div className="text-[10px] text-white/25 uppercase tracking-wider mb-0.5">Material</div>
+										<div className="text-white font-medium">{selectedTier.materialName}</div>
+									</div>
+									<div>
+										<div className="text-[10px] text-white/25 uppercase tracking-wider mb-0.5">Estimate</div>
+										<div className="text-teal-400 font-bold">${selectedTier.totalCost.toLocaleString()}</div>
+									</div>
+									<div>
+										<div className="text-[10px] text-white/25 uppercase tracking-wider mb-0.5">Financing</div>
+										<div className="text-teal-400 font-bold">${selectedTier.monthlyPayment}/mo</div>
+									</div>
+								</div>
+							</div>
+
+							<motion.div
+								className="mt-8 flex items-center justify-center gap-4"
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								transition={{ delay: 0.6 }}
+							>
+								<button className="px-6 py-2.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-sm text-white/60 hover:text-white hover:border-white/10 transition">
+									Download Report
+								</button>
+								<button
+									onClick={() => window.location.reload()}
+									className="px-6 py-2.5 rounded-lg text-sm text-teal-400 hover:text-teal-300 transition"
+								>
+									Try Another Address
+								</button>
 							</motion.div>
 						</motion.div>
 					)}
