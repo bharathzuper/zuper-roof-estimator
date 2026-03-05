@@ -2,39 +2,48 @@
 
 import { useState, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { WizardStep, RoofData, DesiredMaterial, ProjectTimeline } from '@/lib/types';
+import { RoofData, DesiredMaterial, ProjectTimeline } from '@/lib/types';
 import WizardProgress from '@/components/WizardProgress';
 import Step1Welcome from '@/components/Step1Welcome';
-import Step2Address from '@/components/Step2Address';
 import Step3Analysis from '@/components/Step3Analysis';
 import Step4Estimate from '@/components/Step4Estimate';
 import Step5LeadCapture from '@/components/Step5LeadCapture';
 
+type Step = 'hero' | 'analysis' | 'estimate' | 'lead';
+
+const stepOrder: Step[] = ['hero', 'analysis', 'estimate', 'lead'];
+
+const wizardStepMap: Record<Step, number> = {
+	hero: 1,
+	analysis: 2,
+	estimate: 3,
+	lead: 4,
+};
+
 const slideVariants = {
 	enter: (direction: number) => ({
-		x: direction > 0 ? 400 : -400,
+		x: direction > 0 ? 300 : -300,
 		opacity: 0,
 	}),
-	center: {
-		x: 0,
-		opacity: 1,
-	},
+	center: { x: 0, opacity: 1 },
 	exit: (direction: number) => ({
-		x: direction > 0 ? -400 : 400,
+		x: direction > 0 ? -300 : 300,
 		opacity: 0,
 	}),
 };
 
 export default function Home() {
-	const [step, setStep] = useState<WizardStep>(1);
+	const [step, setStep] = useState<Step>('hero');
 	const [direction, setDirection] = useState(1);
 	const [roofData, setRoofData] = useState<RoofData | null>(null);
 	const [desiredMaterial, setDesiredMaterial] = useState<DesiredMaterial>('asphalt');
 	const [timeline, setTimeline] = useState<ProjectTimeline>('no-timeline');
 
-	const goToStep = useCallback(
-		(next: WizardStep) => {
-			setDirection(next > step ? 1 : -1);
+	const goTo = useCallback(
+		(next: Step) => {
+			const curIdx = stepOrder.indexOf(step);
+			const nextIdx = stepOrder.indexOf(next);
+			setDirection(nextIdx > curIdx ? 1 : -1);
 			setStep(next);
 		},
 		[step]
@@ -43,14 +52,16 @@ export default function Home() {
 	const handleAddressSelected = useCallback(
 		(data: RoofData) => {
 			setRoofData(data);
-			goToStep(3);
+			goTo('analysis');
 		},
-		[goToStep]
+		[goTo]
 	);
 
 	return (
 		<main className="min-h-screen relative">
-			<WizardProgress currentStep={step} />
+			{step !== 'hero' && (
+				<WizardProgress currentStep={wizardStepMap[step] as 1 | 2 | 3 | 4 | 5} />
+			)}
 
 			<AnimatePresence mode="wait" custom={direction}>
 				<motion.div
@@ -60,40 +71,35 @@ export default function Home() {
 					initial="enter"
 					animate="center"
 					exit="exit"
-					transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+					transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
 					className="min-h-screen"
 				>
-					{step === 1 && <Step1Welcome onStart={() => goToStep(2)} />}
-
-					{step === 2 && (
-						<Step2Address
-							onAddressSelected={handleAddressSelected}
-							onBack={() => goToStep(1)}
-						/>
+					{step === 'hero' && (
+						<Step1Welcome onAddressSelected={handleAddressSelected} />
 					)}
 
-					{step === 3 && roofData && (
+					{step === 'analysis' && roofData && (
 						<Step3Analysis
 							roofData={roofData}
 							desiredMaterial={desiredMaterial}
 							timeline={timeline}
 							onMaterialChange={setDesiredMaterial}
 							onTimelineChange={setTimeline}
-							onContinue={() => goToStep(4)}
-							onBack={() => goToStep(2)}
+							onContinue={() => goTo('estimate')}
+							onBack={() => goTo('hero')}
 						/>
 					)}
 
-					{step === 4 && roofData && (
+					{step === 'estimate' && roofData && (
 						<Step4Estimate
 							roofData={roofData}
 							desiredMaterial={desiredMaterial}
-							onGetQuote={() => goToStep(5)}
-							onBack={() => goToStep(3)}
+							onGetQuote={() => goTo('lead')}
+							onBack={() => goTo('analysis')}
 						/>
 					)}
 
-					{step === 5 && <Step5LeadCapture onBack={() => goToStep(4)} />}
+					{step === 'lead' && <Step5LeadCapture onBack={() => goTo('estimate')} />}
 				</motion.div>
 			</AnimatePresence>
 		</main>
