@@ -1,43 +1,30 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { motion, useSpring, useMotionValue, useTransform } from 'framer-motion';
+import { useEffect, useRef } from 'react';
+import gsap from 'gsap';
 
 export default function AnimatedCounter({
 	value,
-	prefix = '',
-	suffix = '',
-	duration = 1.5,
 	className = '',
 }: {
 	value: number;
-	prefix?: string;
-	suffix?: string;
-	duration?: number;
 	className?: string;
 }) {
-	const [isInView, setIsInView] = useState(false);
-	const motionValue = useMotionValue(0);
-	const springValue = useSpring(motionValue, { duration: duration * 1000 });
-	const display = useTransform(springValue, (v) =>
-		Math.round(v).toLocaleString()
-	);
+	const spanRef = useRef<HTMLSpanElement>(null);
+	const counterObj = useRef({ val: 0 });
 
 	useEffect(() => {
-		setIsInView(true);
-	}, []);
+		gsap.to(counterObj.current, {
+			val: value,
+			duration: 1.8,
+			ease: 'power2.out',
+			onUpdate: () => {
+				if (spanRef.current) {
+					spanRef.current.textContent = Math.round(counterObj.current.val).toLocaleString();
+				}
+			},
+		});
+	}, [value]);
 
-	useEffect(() => {
-		if (isInView) {
-			motionValue.set(value);
-		}
-	}, [isInView, value, motionValue]);
-
-	return (
-		<span className={className}>
-			{prefix}
-			<motion.span>{display}</motion.span>
-			{suffix}
-		</span>
-	);
+	return <span ref={spanRef} className={className}>0</span>;
 }
