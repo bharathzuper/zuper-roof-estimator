@@ -38,47 +38,31 @@ export default function Step3Analysis({ roofData, onContinue }: Step3Props) {
 	}, []);
 
 	return (
-		<div ref={containerRef} className="min-h-screen relative overflow-hidden" style={{ background: 'var(--color-base)' }}>
-			{/* Oversized background number — the "surprising thing" */}
+		<div ref={containerRef} className="min-h-screen relative overflow-hidden bg-[#080808]">
+			{/* Oversized background number */}
 			<div
 				className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-display font-bold pointer-events-none select-none"
-				style={{
-					fontSize: 'clamp(200px, 30vw, 400px)',
-					color: 'rgba(255,255,255,0.015)',
-					lineHeight: 1,
-					whiteSpace: 'nowrap',
-				}}
+				style={{ fontSize: 'clamp(200px, 30vw, 400px)', color: 'rgba(255,255,255,0.02)', lineHeight: 1, whiteSpace: 'nowrap' }}
 			>
 				{roofData.roofAreaSqFt.toLocaleString()}
 			</div>
 
-			{/* Accent glow */}
 			<div className="glow-accent absolute inset-0 pointer-events-none" />
 
 			<div className="relative z-10 max-w-4xl mx-auto px-5 sm:px-8 py-16 sm:py-20">
 				{/* Badge */}
 				<div className="analysis-badge text-center mb-4">
-					<span
-						className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.12em] uppercase px-3 py-1.5 rounded-md"
-						style={{
-							border: '1px solid rgba(136,255,87,0.2)',
-							color: 'var(--color-accent)',
-							background: 'var(--color-accent-muted)',
-						}}
-					>
-						<span className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--color-accent)' }} />
+					<span className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.12em] uppercase px-3 py-1.5 rounded-md border border-[rgba(136,255,87,0.25)] text-[#88ff57] bg-[rgba(136,255,87,0.08)]">
+						<span className="w-1.5 h-1.5 rounded-full bg-[#88ff57]" />
 						Analysis Complete
 					</span>
 				</div>
 
 				{/* Heading */}
-				<h2
-					className="analysis-heading font-display font-bold text-center mb-2"
-					style={{ fontSize: 'clamp(2rem, 5vw, 3.2rem)', color: 'var(--color-text-primary)' }}
-				>
+				<h2 className="analysis-heading font-display font-bold text-center text-white mb-2" style={{ fontSize: 'clamp(2rem, 5vw, 3.2rem)' }}>
 					Your Roof at a Glance
 				</h2>
-				<p className="analysis-address text-center text-sm mb-10" style={{ color: 'var(--color-text-tertiary)' }}>
+				<p className="analysis-address text-center text-sm text-[#555] mb-10">
 					{roofData.address}{roofData.city ? `, ${roofData.city}, ${roofData.state} ${roofData.zip}` : ''}
 				</p>
 
@@ -90,84 +74,51 @@ export default function Step3Analysis({ roofData, onContinue }: Step3Props) {
 						{ label: 'Sections', value: roofData.sections.length, suffix: '', numeric: false },
 						{ label: 'Confidence', value: roofData.confidence, suffix: '%', numeric: true },
 					].map((stat) => (
-						<div
-							key={stat.label}
-							className="stat-card rounded-lg p-4 transition-colors hover:border-white/10"
-							style={{
-								background: 'var(--color-surface)',
-								border: '1px solid var(--color-border)',
-							}}
-						>
+						<div key={stat.label} className="stat-card card-surface p-4">
 							<div className="tabular font-display text-xl sm:text-2xl font-bold text-white">
 								{stat.numeric ? (
-									<>
-										<AnimatedCounter value={stat.value as number} />
-										{stat.suffix}
-									</>
+									<><AnimatedCounter value={stat.value as number} />{stat.suffix}</>
 								) : (
 									<>{stat.value}{stat.suffix}</>
 								)}
 							</div>
-							<div className="text-xs mt-1" style={{ color: 'var(--color-text-tertiary)' }}>{stat.label}</div>
+							<div className="text-xs mt-1 text-[#555]">{stat.label}</div>
 						</div>
 					))}
 				</div>
 
 				{/* Satellite + sections panel */}
 				<div className="analysis-panel grid sm:grid-cols-5 gap-4 mb-10">
-					<div
-						className="sm:col-span-2 rounded-lg overflow-hidden"
-						style={{ border: '1px solid var(--color-border)' }}
-					>
+					<div className="sm:col-span-2 rounded-xl overflow-hidden border border-[rgba(255,255,255,0.16)]">
 						{roofData.satelliteImageUrl ? (
-							<div
-								className="w-full aspect-[4/3] bg-cover bg-center"
-								style={{ backgroundImage: `url(${roofData.satelliteImageUrl})` }}
-							/>
+							<div className="w-full aspect-[4/3] bg-cover bg-center" style={{ backgroundImage: `url(${roofData.satelliteImageUrl})` }} />
 						) : (
-							<div
-								className="w-full aspect-[4/3] flex items-center justify-center"
-								style={{ background: 'var(--color-surface)' }}
-							>
-								<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-tertiary)" strokeWidth="1.5">
-									<rect x="3" y="3" width="18" height="18" rx="2" />
-									<circle cx="8.5" cy="8.5" r="1.5" />
-									<polyline points="21 15 16 10 5 21" />
+							<div className="w-full aspect-[4/3] bg-[#0f0f0f] flex items-center justify-center">
+								<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="1.5">
+									<rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" />
 								</svg>
 							</div>
 						)}
 					</div>
 					<div className="sm:col-span-3 space-y-2">
-						<h3 className="text-xs font-semibold tracking-[0.1em] uppercase mb-3" style={{ color: 'var(--color-text-tertiary)' }}>
+						<h3 className="text-xs font-semibold tracking-[0.1em] uppercase text-[#555] mb-3">
 							Detected Sections
 						</h3>
 						{roofData.sections.map((section) => (
 							<div
 								key={section.id}
-								className="flex items-center gap-3 rounded-lg px-4 py-3 transition-colors hover:bg-white/[0.02]"
-								style={{
-									background: 'var(--color-surface)',
-									border: '1px solid var(--color-border)',
-								}}
+								className="flex items-center gap-3 rounded-lg px-4 py-3 bg-[#0f0f0f] border border-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.16)] transition-colors"
 							>
-								<div
-									className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0"
-									style={{ background: 'var(--color-accent-muted)', color: 'var(--color-accent)' }}
-								>
+								<div className="w-2 h-8 rounded-full bg-[#88ff57]/30 shrink-0" />
+								<div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 bg-[rgba(136,255,87,0.1)] text-[#88ff57]">
 									{section.id}
 								</div>
 								<div className="flex-1">
 									<span className="text-sm font-medium text-white tabular">{section.areaSqFt.toLocaleString()} sq ft</span>
-									{section.pitch && (
-										<span className="text-xs ml-2" style={{ color: 'var(--color-text-tertiary)' }}>
-											{section.pitch}
-										</span>
-									)}
+									{section.pitch && <span className="text-xs ml-2 text-[#555]">{section.pitch}</span>}
 								</div>
 								{section.azimuth && (
-									<span className="text-[10px] tracking-wider uppercase" style={{ color: 'var(--color-text-tertiary)' }}>
-										{section.azimuth}
-									</span>
+									<span className="text-[10px] tracking-wider uppercase text-[#555]">{section.azimuth}</span>
 								)}
 							</div>
 						))}
@@ -176,9 +127,7 @@ export default function Step3Analysis({ roofData, onContinue }: Step3Props) {
 
 				{/* Material selection */}
 				<div className="mb-10">
-					<h3 className="text-xs font-semibold tracking-[0.1em] uppercase mb-4" style={{ color: 'var(--color-text-tertiary)' }}>
-						Desired Material
-					</h3>
+					<h3 className="text-xs font-semibold tracking-[0.1em] uppercase text-[#555] mb-4">Desired Material</h3>
 					<div className="grid sm:grid-cols-3 gap-3">
 						{MATERIAL_OPTIONS.filter((m) => ['asphalt', 'metal', 'tile'].includes(m.id)).map((mat) => {
 							const active = material === mat.id;
@@ -186,31 +135,25 @@ export default function Step3Analysis({ roofData, onContinue }: Step3Props) {
 								<button
 									key={mat.id}
 									onClick={() => setMaterial(mat.id as DesiredMaterial)}
-									className="material-card text-left rounded-lg p-4 transition-all hover:-translate-y-px"
-									style={{
-										background: active ? 'var(--color-accent-muted)' : 'var(--color-surface)',
-										border: `1px solid ${active ? 'rgba(136,255,87,0.3)' : 'var(--color-border)'}`,
-									}}
+									className={`material-card text-left rounded-xl p-5 transition-all hover:-translate-y-[2px] ${
+										active
+											? 'bg-[rgba(136,255,87,0.08)] border-[rgba(136,255,87,0.35)]'
+											: 'bg-[#0f0f0f] border-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.16)]'
+									} border`}
 								>
-									<div className="flex items-center gap-2.5 mb-2">
-										<div
-											className="w-3 h-3 rounded-full transition-all"
-											style={{
-												border: `2px solid ${active ? 'var(--color-accent)' : 'var(--color-text-tertiary)'}`,
-												background: active ? 'var(--color-accent)' : 'transparent',
-											}}
-										/>
-										<span className="text-sm font-semibold" style={{ color: active ? 'var(--color-accent)' : 'var(--color-text-secondary)' }}>
+									<div className="flex items-center gap-3 mb-2">
+										<div className={`w-4 h-4 rounded-full border-2 transition-all flex items-center justify-center ${
+											active ? 'border-[#88ff57] bg-[#88ff57]' : 'border-[#555]'
+										}`}>
+											{active && <div className="w-1.5 h-1.5 rounded-full bg-[#080808]" />}
+										</div>
+										<span className={`text-sm font-semibold ${active ? 'text-[#88ff57]' : 'text-[#888]'}`}>
 											{mat.name}
 										</span>
 									</div>
-									<p className="text-xs leading-relaxed pl-5" style={{ color: 'var(--color-text-tertiary)' }}>
-										{mat.description}
-									</p>
-									<div className="flex gap-2 mt-2 pl-5 text-[10px] tracking-wider uppercase" style={{ color: 'var(--color-text-tertiary)' }}>
-										<span>{mat.lifespan}</span>
-										<span>·</span>
-										<span>{mat.priceRange}</span>
+									<p className="text-xs leading-relaxed pl-7 text-[#555]">{mat.description}</p>
+									<div className="flex gap-2 mt-2 pl-7 text-[10px] tracking-wider uppercase text-[#555]">
+										<span>{mat.lifespan}</span><span>·</span><span>{mat.priceRange}</span>
 									</div>
 								</button>
 							);
@@ -220,9 +163,7 @@ export default function Step3Analysis({ roofData, onContinue }: Step3Props) {
 
 				{/* Timeline */}
 				<div className="mb-10">
-					<h3 className="text-xs font-semibold tracking-[0.1em] uppercase mb-4" style={{ color: 'var(--color-text-tertiary)' }}>
-						Project Timeline
-					</h3>
+					<h3 className="text-xs font-semibold tracking-[0.1em] uppercase text-[#555] mb-4">Project Timeline</h3>
 					<div className="flex gap-3">
 						{TIMELINE_OPTIONS.map((opt) => {
 							const active = timeline === opt.value;
@@ -230,18 +171,14 @@ export default function Step3Analysis({ roofData, onContinue }: Step3Props) {
 								<button
 									key={opt.value}
 									onClick={() => setTimeline(opt.value)}
-									className="timeline-btn flex-1 rounded-lg p-3 text-center transition-all hover:-translate-y-px"
-									style={{
-										background: active ? 'var(--color-accent-muted)' : 'var(--color-surface)',
-										border: `1px solid ${active ? 'rgba(136,255,87,0.3)' : 'var(--color-border)'}`,
-									}}
+									className={`timeline-btn flex-1 rounded-xl p-4 text-center transition-all hover:-translate-y-[2px] border ${
+										active
+											? 'bg-[rgba(136,255,87,0.08)] border-[rgba(136,255,87,0.35)]'
+											: 'bg-[#0f0f0f] border-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.16)]'
+									}`}
 								>
-									<div className="text-sm font-bold" style={{ color: active ? 'var(--color-accent)' : 'var(--color-text-secondary)' }}>
-										{opt.label}
-									</div>
-									<div className="text-[10px] mt-0.5" style={{ color: 'var(--color-text-tertiary)' }}>
-										{opt.sub}
-									</div>
+									<div className={`text-sm font-bold ${active ? 'text-[#88ff57]' : 'text-[#888]'}`}>{opt.label}</div>
+									<div className="text-[10px] mt-0.5 text-[#555]">{opt.sub}</div>
 								</button>
 							);
 						})}
@@ -252,8 +189,7 @@ export default function Step3Analysis({ roofData, onContinue }: Step3Props) {
 				<button
 					onClick={() => timeline && onContinue(material, timeline)}
 					disabled={!timeline}
-					className="analysis-cta w-full py-4 rounded-lg font-display font-bold text-sm tracking-wide transition-all hover:-translate-y-px disabled:opacity-25 disabled:cursor-not-allowed"
-					style={{ background: 'var(--color-accent)', color: '#080808' }}
+					className="analysis-cta btn-primary"
 				>
 					See My Estimate →
 				</button>

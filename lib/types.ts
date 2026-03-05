@@ -70,12 +70,10 @@ export interface TierEstimate {
 }
 
 export interface LeadFormData {
-	firstName: string;
-	lastName: string;
+	name: string;
 	email: string;
 	phone: string;
 	preferredContact: 'call' | 'text' | 'email';
-	notes: string;
 }
 
 export type WizardStep = 1 | 2 | 3 | 4;

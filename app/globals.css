@@ -9,11 +9,12 @@
 	--color-elevated: #171717;
 	--color-accent: #88ff57;
 	--color-accent-muted: rgba(136, 255, 87, 0.1);
-	--color-border: rgba(255, 255, 255, 0.06);
-	--color-border-strong: rgba(255, 255, 255, 0.12);
+	--color-border: rgba(255, 255, 255, 0.08);
+	--color-border-strong: rgba(255, 255, 255, 0.16);
+	--color-border-input: rgba(255, 255, 255, 0.14);
 	--color-text-primary: #f0f0f0;
 	--color-text-secondary: #888888;
-	--color-text-tertiary: #444444;
+	--color-text-tertiary: #555555;
 }
 
 *,
@@ -55,22 +56,27 @@ h1, h2, h3, h4, .font-display {
 	mix-blend-mode: overlay;
 }
 
-/* ── Map vignette ── */
+/* ── Map vignette (lighter — let the map breathe) ── */
 .vignette::before {
 	content: '';
 	position: absolute;
 	inset: 0;
 	background: radial-gradient(
 		ellipse at center,
-		transparent 20%,
-		rgba(8, 8, 8, 0.45) 65%,
-		rgba(8, 8, 8, 0.92) 100%
+		transparent 30%,
+		rgba(8, 8, 8, 0.30) 70%,
+		rgba(8, 8, 8, 0.75) 100%
 	);
 	pointer-events: none;
 	z-index: 2;
 }
 
-/* ── Accent glow (placed behind key sections) ── */
+/* ── Hero text shadow ── */
+.text-shadow-hero {
+	text-shadow: 0 2px 30px rgba(0, 0, 0, 0.6), 0 1px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Accent glow ── */
 .glow-accent::before {
 	content: '';
 	position: absolute;
@@ -83,19 +89,78 @@ h1, h2, h3, h4, .font-display {
 	pointer-events: none;
 }
 
-/* ── Utility: tabular nums for data ── */
+/* ── Reusable: input field (dark theme forms) ── */
+.input-field {
+	width: 100%;
+	height: 44px;
+	padding: 0 14px;
+	font-size: 14px;
+	color: var(--color-text-primary);
+	background: rgba(255, 255, 255, 0.05);
+	border: 1px solid var(--color-border-input);
+	border-radius: 8px;
+	outline: none;
+	transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input-field::placeholder {
+	color: var(--color-text-tertiary);
+}
+.input-field:focus {
+	border-color: rgba(136, 255, 87, 0.4);
+	box-shadow: 0 0 0 3px rgba(136, 255, 87, 0.1);
+}
+
+/* ── Reusable: primary button ── */
+.btn-primary {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 48px;
+	padding: 0 24px;
+	font-family: var(--font-display), system-ui, sans-serif;
+	font-size: 14px;
+	font-weight: 700;
+	letter-spacing: 0.02em;
+	color: #080808;
+	background: var(--color-accent);
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+}
+.btn-primary:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 6px 20px rgba(136, 255, 87, 0.2);
+}
+.btn-primary:disabled {
+	opacity: 0.3;
+	cursor: not-allowed;
+	transform: none;
+	box-shadow: none;
+}
+
+/* ── Reusable: card surface ── */
+.card-surface {
+	background: var(--color-surface);
+	border: 1px solid var(--color-border-strong);
+	border-radius: 12px;
+	transition: transform 0.25s ease, border-color 0.25s ease;
+}
+.card-surface:hover {
+	border-color: rgba(255, 255, 255, 0.22);
+	transform: translateY(-2px);
+}
+
+/* ── Tabular nums ── */
 .tabular {
 	font-variant-numeric: tabular-nums;
 }
 
 /* ── MapLibre overrides ── */
-.maplibregl-canvas {
-	outline: none;
-}
+.maplibregl-canvas { outline: none; }
 .maplibregl-ctrl-attrib,
-.maplibregl-ctrl-logo {
-	display: none !important;
-}
+.maplibregl-ctrl-logo { display: none !important; }
 
 /* ── Scan line ── */
 @keyframes scan-sweep {
@@ -109,17 +174,8 @@ h1, h2, h3, h4, .font-display {
 	color: #fff;
 }
 
-/* ── Scrollbar (minimal) ── */
-::-webkit-scrollbar {
-	width: 6px;
-}
-::-webkit-scrollbar-track {
-	background: transparent;
-}
-::-webkit-scrollbar-thumb {
-	background: rgba(255, 255, 255, 0.08);
-	border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-	background: rgba(255, 255, 255, 0.15);
-}
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.08); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.15); }
