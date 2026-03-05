@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RoofData } from '@/lib/types';
 import { MOCK_ADDRESSES, filterAddresses } from '@/lib/mock-data';
+import { hasGoogleApiKey, geocodeAddress, fetchBuildingInsights, getSatelliteImageUrl } from '@/lib/google-apis';
 
 const SCAN_STEPS = [
 	{ label: 'Locating your property...', icon: '📍', duration: 800 },
@@ -11,6 +12,8 @@ const SCAN_STEPS = [
 	{ label: 'Measuring roof dimensions...', icon: '📐', duration: 900 },
 	{ label: 'Detecting roof features...', icon: '✨', duration: 700 },
 ];
+
+const isLiveMode = hasGoogleApiKey();
 
 function SatelliteOverlay({ roofData, scanPhase }: { roofData: RoofData; scanPhase: number }) {
 	return (
@@ -135,29 +138,100 @@ export default function Step2Address({
 	const [scanPhase, setScanPhase] = useState(0);
 	const [scanStepIdx, setScanStepIdx] = useState(-1);
 	const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+	const [isLoadingLive, setIsLoadingLive] = useState(false);
+	const [liveError, setLiveError] = useState('');
 	const inputRef = useRef<HTMLInputElement>(null);
+	const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+	const searchLiveAddresses = useCallback(async (q: string) => {
+		if (!isLiveMode || q.length < 5) return;
+		// In live mode, we show a "Search" button instead of suggestions
+		// since we'll geocode the full address when they submit
+	}, []);
 
 	useEffect(() => {
-		if (query.length >= 2) {
-			const results = filterAddresses(query);
-			setSuggestions(results.length > 0 ? results : MOCK_ADDRESSES);
-			setShowSuggestions(true);
+		if (!isLiveMode) {
+			if (query.length >= 2) {
+				const results = filterAddresses(query);
+				setSuggestions(results.length > 0 ? results : MOCK_ADDRESSES);
+				setShowSuggestions(true);
+			} else {
+				setSuggestions([]);
+				setShowSuggestions(false);
+			}
 		} else {
-			setSuggestions([]);
-			setShowSuggestions(false);
+			if (debounceRef.current) clearTimeout(debounceRef.current);
+			debounceRef.current = setTimeout(() => searchLiveAddresses(query), 300);
 		}
-	}, [query]);
+	}, [query, searchLiveAddresses]);
 
-	const handleSelect = (data: RoofData) => {
+	const handleSelectMock = (data: RoofData) => {
 		setQuery(`${data.address}, ${data.city}, ${data.state} ${data.zip}`);
 		setSelectedAddress(data);
 		setShowSuggestions(false);
 		startScan(data);
 	};
 
-	const startScan = (data: RoofData) => {
+	const handleLiveSearch = async () => {
+		if (!query.trim()) return;
+		setIsLoadingLive(true);
+		setLiveError('');
+
+		try {
+			const coords = await geocodeAddress(query);
+			if (!coords) {
+				setLiveError('Could not find that address. Please try a more specific address.');
+				setIsLoadingLive(false);
+				return;
+			}
+
+			const satelliteUrl = getSatelliteImageUrl(coords.lat, coords.lng);
+
+			// Start the scan animation with satellite image while Solar API loads
+			const partialData: RoofData = {
+				address: query,
+				city: '',
+				state: '',
+				zip: '',
+				roofAreaSqFt: 0,
+				pitch: '0/12',
+				pitchLabel: '',
+				sections: [],
+				stories: 1,
+				buildingType: 'residential',
+				currentMaterial: 'asphalt',
+				satelliteImageUrl: satelliteUrl,
+				confidence: 0,
+			};
+
+			setSelectedAddress(partialData);
+			setScanPhase(1);
+			setScanStepIdx(0);
+
+			// Fetch real roof data from Solar API
+			const roofData = await fetchBuildingInsights(coords.lat, coords.lng);
+
+			if (roofData) {
+				roofData.address = query;
+				setSelectedAddress(roofData);
+				runScanAnimation(roofData);
+			} else {
+				setLiveError('Roof analysis not available for this address. Solar API coverage may be limited.');
+				setSelectedAddress(null);
+				setScanPhase(0);
+				setScanStepIdx(-1);
+			}
+		} catch {
+			setLiveError('Something went wrong. Please try again.');
+		} finally {
+			setIsLoadingLive(false);
+		}
+	};
+
+	const runScanAnimation = (data: RoofData) => {
 		setScanPhase(1);
 		setScanStepIdx(0);
+		setCompletedSteps([]);
 
 		let elapsed = 0;
 		SCAN_STEPS.forEach((step, i) => {
@@ -174,6 +248,10 @@ export default function Step2Address({
 			setCompletedSteps([0, 1, 2, 3]);
 			setTimeout(() => onAddressSelected(data), 600);
 		}, totalTime + 300);
+	};
+
+	const startScan = (data: RoofData) => {
+		runScanAnimation(data);
 	};
 
 	const isScanning = selectedAddress !== null;
@@ -213,39 +291,102 @@ export default function Step2Address({
 						animate={{ opacity: 1 }}
 						transition={{ delay: 0.3 }}
 					>
-						We&apos;ll use satellite imagery to analyze your roof
+						{isLiveMode
+							? 'Enter your full address — we\'ll analyze the real satellite imagery'
+							: 'We\'ll use satellite imagery to analyze your roof'}
 					</motion.p>
 
+					{/* Mode indicator */}
+					{isLiveMode && (
+						<motion.div
+							className="flex items-center gap-2 mb-4 px-3 py-2 bg-emerald-50 rounded-lg border border-emerald-200"
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							transition={{ delay: 0.25 }}
+						>
+							<div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+							<span className="text-xs font-medium text-emerald-700">
+								Live Mode — Using Google Solar API for real satellite analysis
+							</span>
+						</motion.div>
+					)}
+
 					<div className="relative mb-6">
-						<div className="relative">
-							<svg className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-								<circle cx="11" cy="11" r="8" />
-								<path d="M21 21l-4.35-4.35" />
-							</svg>
-							<input
-								ref={inputRef}
-								type="text"
-								value={query}
-								onChange={(e) => setQuery(e.target.value)}
-								placeholder="Enter your street address"
-								disabled={isScanning}
-								className="w-full pl-11 pr-10 py-4 text-base border-2 border-slate-200 rounded-xl focus:border-sky-400 focus:ring-4 focus:ring-sky-100 outline-none transition-all disabled:bg-slate-50 disabled:text-slate-500"
-							/>
-							{query && !isScanning && (
+						<div className="relative flex gap-2">
+							<div className="relative flex-1">
+								<svg className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+									<circle cx="11" cy="11" r="8" />
+									<path d="M21 21l-4.35-4.35" />
+								</svg>
+								<input
+									ref={inputRef}
+									type="text"
+									value={query}
+									onChange={(e) => setQuery(e.target.value)}
+									onKeyDown={(e) => {
+										if (e.key === 'Enter' && isLiveMode && !isScanning) handleLiveSearch();
+									}}
+									placeholder={isLiveMode ? 'Enter your full street address' : 'Enter your street address'}
+									disabled={isScanning}
+									className="w-full pl-11 pr-10 py-4 text-base border-2 border-slate-200 rounded-xl focus:border-sky-400 focus:ring-4 focus:ring-sky-100 outline-none transition-all disabled:bg-slate-50 disabled:text-slate-500"
+								/>
+								{query && !isScanning && (
+									<button
+										onClick={() => { setQuery(''); setSuggestions([]); setLiveError(''); }}
+										className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+									>
+										<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+											<circle cx="12" cy="12" r="10" />
+											<path d="M15 9l-6 6M9 9l6 6" />
+										</svg>
+									</button>
+								)}
+							</div>
+
+							{isLiveMode && !isScanning && (
 								<button
-									onClick={() => { setQuery(''); setSuggestions([]); }}
-									className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+									onClick={handleLiveSearch}
+									disabled={!query.trim() || isLoadingLive}
+									className="px-6 py-4 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 transition-colors disabled:bg-slate-300 disabled:cursor-not-allowed shrink-0 flex items-center gap-2"
 								>
-									<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-										<circle cx="12" cy="12" r="10" />
-										<path d="M15 9l-6 6M9 9l6 6" />
-									</svg>
+									{isLoadingLive ? (
+										<>
+											<motion.div
+												className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
+												animate={{ rotate: 360 }}
+												transition={{ repeat: Infinity, duration: 0.8, ease: 'linear' }}
+											/>
+											Analyzing...
+										</>
+									) : (
+										<>
+											Search
+											<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+												<path d="M5 12h14M12 5l7 7-7 7" />
+											</svg>
+										</>
+									)}
 								</button>
 							)}
 						</div>
 
+						{liveError && (
+							<motion.p
+								className="mt-2 text-sm text-red-500 flex items-center gap-1"
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+							>
+								<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+									<circle cx="12" cy="12" r="10" />
+									<path d="M15 9l-6 6M9 9l6 6" />
+								</svg>
+								{liveError}
+							</motion.p>
+						)}
+
+						{/* Mock mode suggestions */}
 						<AnimatePresence>
-							{showSuggestions && suggestions.length > 0 && !isScanning && (
+							{!isLiveMode && showSuggestions && suggestions.length > 0 && !isScanning && (
 								<motion.div
 									className="absolute z-20 left-0 right-0 mt-2 bg-white border border-slate-200 rounded-xl shadow-lg overflow-hidden"
 									initial={{ opacity: 0, y: -10 }}
@@ -255,7 +396,7 @@ export default function Step2Address({
 									{suggestions.map((s) => (
 										<button
 											key={s.address}
-											onClick={() => handleSelect(s)}
+											onClick={() => handleSelectMock(s)}
 											className="w-full text-left px-4 py-3 hover:bg-sky-50 transition-colors flex items-center gap-3 border-b border-slate-100 last:border-0"
 										>
 											<svg className="text-slate-400 shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -326,7 +467,7 @@ export default function Step2Address({
 						</motion.div>
 					)}
 
-					{!isScanning && (
+					{!isScanning && !isLiveMode && (
 						<motion.p
 							className="text-xs text-slate-400 text-center mt-4"
 							initial={{ opacity: 0 }}
@@ -334,6 +475,17 @@ export default function Step2Address({
 							transition={{ delay: 0.5 }}
 						>
 							Try: &quot;742 Evergreen&quot;, &quot;1247 Oakwood&quot;, &quot;891 Cedar&quot;, or &quot;2055 Sunset&quot;
+						</motion.p>
+					)}
+
+					{!isScanning && isLiveMode && (
+						<motion.p
+							className="text-xs text-slate-400 text-center mt-4"
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							transition={{ delay: 0.5 }}
+						>
+							Enter any US address — we use Google Solar API to analyze real satellite imagery
 						</motion.p>
 					)}
 				</motion.div>
