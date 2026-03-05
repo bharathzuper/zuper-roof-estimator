@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RoofData } from '@/lib/types';
 import { MOCK_ADDRESSES, filterAddresses } from '@/lib/mock-data';
-import { hasGoogleApiKey, geocodeAddress, fetchBuildingInsights, getSatelliteImageUrl } from '@/lib/google-apis';
+import { hasGoogleApiKey, geocodeAddress, fetchBuildingInsights, getSatelliteImageUrl, getEsriSatelliteUrl } from '@/lib/google-apis';
 
 const isLiveMode = hasGoogleApiKey();
 
@@ -211,6 +211,7 @@ export default function Step1Welcome({ onAddressSelected }: { onAddressSelected:
 			const satelliteUrl = getSatelliteImageUrl(coords.lat, coords.lng);
 			const partial: RoofData = {
 				address: query, city: '', state: '', zip: '',
+				lat: coords.lat, lng: coords.lng,
 				roofAreaSqFt: 0, pitch: '0/12', pitchLabel: '', sections: [], stories: 1,
 				buildingType: 'residential', currentMaterial: 'asphalt',
 				satelliteImageUrl: satelliteUrl, confidence: 0,
@@ -248,42 +249,13 @@ export default function Step1Welcome({ onAddressSelected }: { onAddressSelected:
 						transition={{ duration: 1 }}
 					/>
 				) : (
-					<div className="absolute inset-0 satellite-bg">
-						{/* Multi-layer CSS satellite effect */}
-						<div className="absolute inset-0" style={{
-							background: `
-								radial-gradient(ellipse 800px 600px at 30% 40%, #1e3a2f 0%, transparent 70%),
-								radial-gradient(ellipse 600px 500px at 70% 60%, #2a3020 0%, transparent 70%),
-								radial-gradient(ellipse 400px 300px at 50% 30%, #2d3a2a 0%, transparent 60%),
-								linear-gradient(135deg, #1a2a1e 0%, #1c2620 30%, #202820 60%, #1a2218 100%)
-							`,
-						}} />
-						{/* Grid: streets */}
-						<div className="absolute inset-0 opacity-[0.12]" style={{
-							backgroundImage: `
-								linear-gradient(0deg, rgba(180,190,170,0.4) 1px, transparent 1px),
-								linear-gradient(90deg, rgba(180,190,170,0.4) 1px, transparent 1px),
-								linear-gradient(0deg, rgba(200,210,190,0.15) 1px, transparent 1px),
-								linear-gradient(90deg, rgba(200,210,190,0.15) 1px, transparent 1px)
-							`,
-							backgroundSize: '180px 180px, 180px 180px, 45px 45px, 45px 45px',
-						}} />
-						{/* Rooftop shapes */}
-						<svg className="absolute inset-0 w-full h-full opacity-[0.08]" viewBox="0 0 100 100" preserveAspectRatio="none">
-							{[
-								'10,15 18,15 18,22 10,22', '22,10 30,10 30,18 22,18',
-								'35,20 45,20 45,30 35,30', '55,12 65,12 65,22 55,22',
-								'72,18 82,18 82,28 72,28', '15,35 25,35 25,45 15,45',
-								'40,40 50,40 50,50 40,50', '60,35 72,35 72,48 60,48',
-								'80,40 90,40 90,50 80,50', '20,55 32,55 32,65 20,65',
-								'45,58 55,58 55,68 45,68', '65,55 78,55 78,68 65,68',
-								'10,72 22,72 22,82 10,82', '30,75 42,75 42,85 30,85',
-								'55,72 65,72 65,82 55,82', '75,70 88,70 88,82 75,82',
-							].map((pts, i) => (
-								<polygon key={i} points={pts} fill="rgba(100,120,90,0.6)" stroke="rgba(80,100,70,0.3)" strokeWidth="0.3" />
-							))}
-						</svg>
-					</div>
+					<div
+						className="absolute inset-0 bg-cover bg-center"
+						style={{
+							backgroundImage: `url(${getEsriSatelliteUrl(32.8143, -96.7714, 1920, 1080, 0.006)})`,
+							backgroundColor: '#1a2a1e',
+						}}
+					/>
 				)}
 			</motion.div>
 

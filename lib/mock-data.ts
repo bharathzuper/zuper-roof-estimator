@@ -1,4 +1,5 @@
 import { RoofData, MaterialOption } from './types';
+import { getEsriSatelliteUrl } from './google-apis';
 
 export const MOCK_ADDRESSES: RoofData[] = [
 	{
@@ -6,6 +7,8 @@ export const MOCK_ADDRESSES: RoofData[] = [
 		city: 'Dallas',
 		state: 'TX',
 		zip: '75201',
+		lat: 32.8143,
+		lng: -96.7714,
 		roofAreaSqFt: 2850,
 		pitch: '6/12',
 		pitchLabel: 'Moderate',
@@ -48,7 +51,7 @@ export const MOCK_ADDRESSES: RoofData[] = [
 		stories: 2,
 		buildingType: 'residential',
 		currentMaterial: 'asphalt',
-		satelliteImageUrl: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&q=80',
+		satelliteImageUrl: getEsriSatelliteUrl(32.8143, -96.7714),
 		confidence: 98,
 	},
 	{
@@ -56,6 +59,8 @@ export const MOCK_ADDRESSES: RoofData[] = [
 		city: 'Plano',
 		state: 'TX',
 		zip: '75025',
+		lat: 33.0462,
+		lng: -96.7320,
 		roofAreaSqFt: 3200,
 		pitch: '7/12',
 		pitchLabel: 'Moderate-Steep',
@@ -112,7 +117,7 @@ export const MOCK_ADDRESSES: RoofData[] = [
 		stories: 1,
 		buildingType: 'residential',
 		currentMaterial: 'asphalt',
-		satelliteImageUrl: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80',
+		satelliteImageUrl: getEsriSatelliteUrl(33.0462, -96.7320),
 		confidence: 96,
 	},
 	{
@@ -120,6 +125,8 @@ export const MOCK_ADDRESSES: RoofData[] = [
 		city: 'Frisco',
 		state: 'TX',
 		zip: '75034',
+		lat: 33.1507,
+		lng: -96.8236,
 		roofAreaSqFt: 2100,
 		pitch: '5/12',
 		pitchLabel: 'Low-Moderate',
@@ -162,7 +169,7 @@ export const MOCK_ADDRESSES: RoofData[] = [
 		stories: 2,
 		buildingType: 'residential',
 		currentMaterial: 'metal',
-		satelliteImageUrl: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80',
+		satelliteImageUrl: getEsriSatelliteUrl(33.1507, -96.8236),
 		confidence: 97,
 	},
 	{
@@ -170,6 +177,8 @@ export const MOCK_ADDRESSES: RoofData[] = [
 		city: 'McKinney',
 		state: 'TX',
 		zip: '75070',
+		lat: 33.1972,
+		lng: -96.6500,
 		roofAreaSqFt: 3800,
 		pitch: '8/12',
 		pitchLabel: 'Steep',
@@ -243,7 +252,7 @@ export const MOCK_ADDRESSES: RoofData[] = [
 		stories: 2,
 		buildingType: 'residential',
 		currentMaterial: 'tile',
-		satelliteImageUrl: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80',
+		satelliteImageUrl: getEsriSatelliteUrl(33.1972, -96.6500),
 		confidence: 95,
 	},
 ];
@@ -256,7 +265,7 @@ export const MATERIAL_OPTIONS: MaterialOption[] = [
 		description: 'Most popular choice. Affordable, reliable, and available in many styles.',
 		lifespan: '20–30 years',
 		priceRange: '$3–7/sq ft',
-		imageUrl: 'https://images.unsplash.com/photo-1632759145351-1d592919f522?w=400&q=80',
+		imageUrl: '',
 	},
 	{
 		id: 'metal',
@@ -265,7 +274,7 @@ export const MATERIAL_OPTIONS: MaterialOption[] = [
 		description: 'Extremely durable and energy-efficient. Great for all climates.',
 		lifespan: '40–70 years',
 		priceRange: '$5–14/sq ft',
-		imageUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&q=80',
+		imageUrl: '',
 	},
 	{
 		id: 'tile',
@@ -274,7 +283,7 @@ export const MATERIAL_OPTIONS: MaterialOption[] = [
 		description: 'Premium look with exceptional longevity. Classic Mediterranean style.',
 		lifespan: '50–100 years',
 		priceRange: '$6–16/sq ft',
-		imageUrl: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&q=80',
+		imageUrl: '',
 	},
 ];
 

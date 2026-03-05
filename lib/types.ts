@@ -13,6 +13,8 @@ export interface RoofData {
 	city: string;
 	state: string;
 	zip: string;
+	lat: number;
+	lng: number;
 	roofAreaSqFt: number;
 	pitch: string;
 	pitchLabel: string;

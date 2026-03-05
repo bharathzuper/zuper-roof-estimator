@@ -6,9 +6,25 @@ export function hasGoogleApiKey(): boolean {
 	return API_KEY.length > 0;
 }
 
+/**
+ * ESRI World Imagery — free, no API key, real satellite.
+ * delta controls zoom: 0.001 ≈ roof-level, 0.005 ≈ neighborhood, 0.015 ≈ district
+ */
+export function getEsriSatelliteUrl(
+	lat: number,
+	lng: number,
+	width = 800,
+	height = 600,
+	delta = 0.0015,
+): string {
+	return `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export?bbox=${lng - delta},${lat - delta},${lng + delta},${lat + delta}&bboxSR=4326&size=${width},${height}&imageSR=4326&format=png&f=image`;
+}
+
 export function getSatelliteImageUrl(lat: number, lng: number, zoom = 20, size = '600x400'): string {
-	if (!API_KEY) return '';
-	return `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=${zoom}&size=${size}&maptype=satellite&scale=2&key=${API_KEY}`;
+	if (API_KEY) {
+		return `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=${zoom}&size=${size}&maptype=satellite&scale=2&key=${API_KEY}`;
+	}
+	return getEsriSatelliteUrl(lat, lng);
 }
 
 function pitchDegreesToRatio(degrees: number): string {
@@ -141,6 +157,8 @@ export async function fetchBuildingInsights(
 			city: '',
 			state: '',
 			zip: '',
+			lat,
+			lng,
 			roofAreaSqFt: totalAreaSqFt,
 			pitch: pitchDegreesToRatio(avgPitch),
 			pitchLabel: pitchDegreesToLabel(avgPitch),
