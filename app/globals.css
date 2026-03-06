@@ -119,7 +119,7 @@ h1, h2, h3, h4, .font-display {
 
 /* ── Selection ── */
 ::selection {
-	background: rgba(20, 184, 166, 0.25);
+	background: rgba(228, 74, 25, 0.25);
 	color: #fff;
 }
 

@@ -78,9 +78,9 @@ export default function StepMaterials({ roofData, aiAnalysis, onContinue }: Step
 									onClick={() => setMaterial(mat.id as DesiredMaterial)}
 									className={cn(
 										'group relative text-left rounded-2xl border outline-none overflow-hidden',
-										'focus-visible:ring-2 focus-visible:ring-emerald-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111]',
+										'focus-visible:ring-2 focus-visible:ring-zuper-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111]',
 										active
-											? 'border-emerald-500/30 bg-emerald-500/[0.06] shadow-[0_0_0_1px_rgba(52,211,153,0.12)]'
+											? 'border-zuper-500/30 bg-zuper-500/[0.06] shadow-[0_0_0_1px_rgba(228,74,25,0.12)]'
 											: 'border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12] hover:bg-white/[0.035]',
 									)}
 									style={{ touchAction: 'manipulation', transition: 'background-color 200ms, border-color 200ms, box-shadow 200ms' }}
@@ -95,12 +95,12 @@ export default function StepMaterials({ roofData, aiAnalysis, onContinue }: Step
 											style={{ transition: 'opacity 300ms, transform 500ms' }}
 										/>
 										{active && (
-											<div className="absolute inset-0 bg-emerald-500/10 border-b border-emerald-500/20" />
+											<div className="absolute inset-0 bg-zuper-500/10 border-b border-zuper-500/20" />
 										)}
 										{/* AI Recommended badge */}
 										{isRecommended && (
 											<div className="absolute top-3 left-3">
-												<span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/90 backdrop-blur-sm px-2.5 py-1 text-[10px] font-bold text-white shadow-lg shadow-emerald-500/20">
+												<span className="inline-flex items-center gap-1 rounded-full bg-ai-500/90 backdrop-blur-sm px-2.5 py-1 text-[10px] font-bold text-white shadow-lg shadow-ai-500/20">
 													<Sparkles className="h-2.5 w-2.5" aria-hidden="true" />
 													AI Pick
 												</span>
@@ -111,7 +111,7 @@ export default function StepMaterials({ roofData, aiAnalysis, onContinue }: Step
 											<div className={cn(
 												'h-6 w-6 rounded-full flex items-center justify-center backdrop-blur-sm',
 												active
-													? 'bg-emerald-400 shadow-lg shadow-emerald-500/30'
+													? 'bg-zuper-500 shadow-lg shadow-zuper-500/30'
 													: 'bg-black/40 border border-white/20',
 											)}>
 												{active && <Check className="h-3.5 w-3.5 text-[#111]" strokeWidth={3} aria-hidden="true" />}
@@ -122,7 +122,7 @@ export default function StepMaterials({ roofData, aiAnalysis, onContinue }: Step
 									<div className="p-4">
 										<span className={cn(
 											'text-sm font-semibold block mb-1',
-											active ? 'text-emerald-400' : 'text-neutral-200 group-hover:text-white',
+											active ? 'text-zuper-400' : 'text-neutral-200 group-hover:text-white',
 										)}>
 											{mat.name}
 										</span>
@@ -146,13 +146,13 @@ export default function StepMaterials({ roofData, aiAnalysis, onContinue }: Step
 				{/* AI Reasoning */}
 				{recommendation && (
 					<div data-animate className="mb-10">
-						<div className="rounded-2xl border border-emerald-500/10 bg-emerald-500/[0.03] p-4">
+						<div className="rounded-2xl border border-ai-500/10 bg-ai-500/[0.03] p-4">
 							<div className="flex items-start gap-3">
-								<div className="mt-0.5 h-5 w-5 rounded-lg bg-emerald-400/10 flex items-center justify-center shrink-0">
-									<Sparkles className="h-3 w-3 text-emerald-400" aria-hidden="true" />
+								<div className="mt-0.5 h-5 w-5 rounded-lg bg-ai-400/10 flex items-center justify-center shrink-0">
+									<Sparkles className="h-3 w-3 text-ai-400" aria-hidden="true" />
 								</div>
 								<div>
-									<span className="text-[10px] font-semibold uppercase tracking-widest text-emerald-400/70 block mb-1">
+									<span className="text-[10px] font-semibold uppercase tracking-widest text-ai-400/70 block mb-1">
 										AI Recommendation
 									</span>
 									<p className="text-sm leading-relaxed text-neutral-400">
@@ -184,16 +184,16 @@ export default function StepMaterials({ roofData, aiAnalysis, onContinue }: Step
 									onClick={() => setTimeline(opt.value)}
 									className={cn(
 										'rounded-2xl py-4 px-3 text-center border outline-none',
-										'focus-visible:ring-2 focus-visible:ring-emerald-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111]',
+										'focus-visible:ring-2 focus-visible:ring-zuper-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111]',
 										active
-											? 'border-emerald-500/30 bg-emerald-500/[0.06] shadow-[0_0_0_1px_rgba(52,211,153,0.12)]'
+											? 'border-zuper-500/30 bg-zuper-500/[0.06] shadow-[0_0_0_1px_rgba(228,74,25,0.12)]'
 											: 'border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12] hover:bg-white/[0.035]',
 									)}
 									style={{ touchAction: 'manipulation', transition: 'background-color 200ms, border-color 200ms, box-shadow 200ms' }}
 								>
 									<span className={cn(
 										'block text-sm font-bold',
-										active ? 'text-emerald-400' : 'text-neutral-300',
+										active ? 'text-zuper-400' : 'text-neutral-300',
 									)}>
 										{opt.label}
 									</span>
@@ -213,9 +213,9 @@ export default function StepMaterials({ roofData, aiAnalysis, onContinue }: Step
 						className={cn(
 							'w-full h-13 rounded-2xl text-sm font-bold tracking-wide',
 							'inline-flex items-center justify-center gap-2 outline-none',
-							'focus-visible:ring-2 focus-visible:ring-emerald-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111]',
+							'focus-visible:ring-2 focus-visible:ring-zuper-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111]',
 							'disabled:opacity-25 disabled:cursor-not-allowed',
-							'bg-emerald-500 text-white hover:bg-emerald-400 active:bg-emerald-600',
+							'bg-zuper-500 text-white hover:bg-zuper-400 active:bg-zuper-600',
 						)}
 						style={{ touchAction: 'manipulation', transition: 'background-color 200ms, opacity 200ms' }}
 					>

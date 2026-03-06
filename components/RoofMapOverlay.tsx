@@ -5,8 +5,8 @@ import gsap from 'gsap';
 import { RoofSection } from '@/lib/types';
 
 const PALETTE = [
-	{ fill: 'rgba(59,130,246,0.15)', stroke: '#3b82f6', label: '#3b82f6' },
-	{ fill: 'rgba(59,130,246,0.15)', stroke: '#3b82f6', label: '#3b82f6' },
+	{ fill: 'rgba(139,92,246,0.15)', stroke: '#8B5CF6', label: '#8B5CF6' },
+	{ fill: 'rgba(139,92,246,0.15)', stroke: '#8B5CF6', label: '#8B5CF6' },
 	{ fill: 'rgba(244,114,182,0.15)', stroke: '#f472b6', label: '#f472b6' },
 	{ fill: 'rgba(251,191,36,0.15)', stroke: '#fbbf24', label: '#fbbf24' },
 ];

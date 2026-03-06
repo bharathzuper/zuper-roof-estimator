@@ -75,15 +75,15 @@ export default function Step5LeadCapture({ roofData, desiredMaterial, timeline, 
 		return (
 			<div ref={containerRef} className="min-h-screen bg-[#111] flex items-center justify-center px-5">
 				<div className="text-center">
-					<div className="success-icon mx-auto w-20 h-20 rounded-2xl mb-6 flex items-center justify-center bg-emerald-400/10 border border-emerald-400/25">
-						<Check className="h-9 w-9 text-emerald-400" strokeWidth={2.5} aria-hidden="true" />
+					<div className="success-icon mx-auto w-20 h-20 rounded-2xl mb-6 flex items-center justify-center bg-zuper-500/10 border border-zuper-500/25">
+						<Check className="h-9 w-9 text-zuper-500" strokeWidth={2.5} aria-hidden="true" />
 					</div>
 					<div className="success-text">
 						<h1 className="font-display font-bold text-white mb-2 text-3xl sm:text-4xl" style={{ textWrap: 'balance' }}>
 							You&apos;re All Set!
 						</h1>
 						<p className="text-sm text-neutral-500 max-w-sm mx-auto leading-relaxed">
-							A certified roofer will reach out within 24 hours to schedule an inspection and provide your exact <span className="text-emerald-400 font-medium">{mid.materialName}</span> quote.
+							A certified roofer will reach out within 24 hours to schedule an inspection and provide your exact <span className="text-zuper-400 font-medium">{mid.materialName}</span> quote.
 						</p>
 					</div>
 				</div>
@@ -104,7 +104,7 @@ export default function Step5LeadCapture({ roofData, desiredMaterial, timeline, 
 								<span className="font-display text-base font-bold text-white">{mid.materialName}</span>
 							</div>
 							<div className="text-right">
-								<div className="font-display text-xl sm:text-2xl font-extrabold text-emerald-400" style={{ fontVariantNumeric: 'tabular-nums' }}>
+								<div className="font-display text-xl sm:text-2xl font-extrabold text-zuper-400" style={{ fontVariantNumeric: 'tabular-nums' }}>
 									${rangeLow.toLocaleString()} &ndash; ${rangeHigh.toLocaleString()}
 								</div>
 								<div className="text-xs text-neutral-500">
@@ -122,7 +122,7 @@ export default function Step5LeadCapture({ roofData, desiredMaterial, timeline, 
 									<span className="text-[10px] text-neutral-600">
 										AI Score: <span className={cn(
 											'font-semibold',
-											aiAnalysis.conditionScore >= 7 ? 'text-emerald-400' : aiAnalysis.conditionScore >= 4.5 ? 'text-amber-400' : 'text-red-400',
+											aiAnalysis.conditionScore >= 7 ? 'text-ai-400' : aiAnalysis.conditionScore >= 4.5 ? 'text-amber-400' : 'text-red-400',
 										)}>{aiAnalysis.conditionScore}/10</span>
 									</span>
 								</>
@@ -156,7 +156,7 @@ export default function Step5LeadCapture({ roofData, desiredMaterial, timeline, 
 							value={name}
 							onChange={(e) => setName(e.target.value)}
 							placeholder="Jane Smith\u2026"
-							className="w-full h-11 px-3.5 text-sm text-white bg-white/[0.03] border border-white/[0.08] rounded-xl outline-none placeholder:text-neutral-600 focus-visible:border-emerald-400/40 focus-visible:ring-2 focus-visible:ring-emerald-400/20"
+							className="w-full h-11 px-3.5 text-sm text-white bg-white/[0.03] border border-white/[0.08] rounded-xl outline-none placeholder:text-neutral-600 focus-visible:border-zuper-500/40 focus-visible:ring-2 focus-visible:ring-zuper-500/20"
 						/>
 					</div>
 
@@ -172,7 +172,7 @@ export default function Step5LeadCapture({ roofData, desiredMaterial, timeline, 
 							value={email}
 							onChange={(e) => setEmail(e.target.value)}
 							placeholder="jane@example.com\u2026"
-							className="w-full h-11 px-3.5 text-sm text-white bg-white/[0.03] border border-white/[0.08] rounded-xl outline-none placeholder:text-neutral-600 focus-visible:border-emerald-400/40 focus-visible:ring-2 focus-visible:ring-emerald-400/20"
+							className="w-full h-11 px-3.5 text-sm text-white bg-white/[0.03] border border-white/[0.08] rounded-xl outline-none placeholder:text-neutral-600 focus-visible:border-zuper-500/40 focus-visible:ring-2 focus-visible:ring-zuper-500/20"
 						/>
 					</div>
 
@@ -187,7 +187,7 @@ export default function Step5LeadCapture({ roofData, desiredMaterial, timeline, 
 							value={phone}
 							onChange={(e) => setPhone(e.target.value)}
 							placeholder="(555) 000-0000\u2026"
-							className="w-full h-11 px-3.5 text-sm text-white bg-white/[0.03] border border-white/[0.08] rounded-xl outline-none placeholder:text-neutral-600 focus-visible:border-emerald-400/40 focus-visible:ring-2 focus-visible:ring-emerald-400/20"
+							className="w-full h-11 px-3.5 text-sm text-white bg-white/[0.03] border border-white/[0.08] rounded-xl outline-none placeholder:text-neutral-600 focus-visible:border-zuper-500/40 focus-visible:ring-2 focus-visible:ring-zuper-500/20"
 						/>
 					</div>
 
@@ -210,9 +210,9 @@ export default function Step5LeadCapture({ roofData, desiredMaterial, timeline, 
 										onClick={() => setContactPref(opt)}
 										className={cn(
 											'flex-1 h-10 rounded-xl text-xs font-semibold capitalize border outline-none',
-											'focus-visible:ring-2 focus-visible:ring-emerald-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111]',
+											'focus-visible:ring-2 focus-visible:ring-zuper-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111]',
 											active
-												? 'bg-emerald-500/[0.08] text-emerald-400 border-emerald-500/25'
+												? 'bg-zuper-500/[0.08] text-zuper-400 border-zuper-500/25'
 												: 'text-neutral-500 border-white/[0.08] hover:border-white/[0.14] hover:text-neutral-400',
 										)}
 										style={{ touchAction: 'manipulation', transition: 'background-color 200ms, border-color 200ms, color 200ms' }}
@@ -236,7 +236,7 @@ export default function Step5LeadCapture({ roofData, desiredMaterial, timeline, 
 							value={projectNotes}
 							onChange={(e) => setProjectNotes(e.target.value)}
 							placeholder="Provide any additional details which will help us prepare your roofing estimate\u2026"
-							className="w-full px-3.5 py-3 text-sm text-white bg-white/[0.03] border border-white/[0.08] rounded-xl outline-none placeholder:text-neutral-600 focus-visible:border-emerald-400/40 focus-visible:ring-2 focus-visible:ring-emerald-400/20 resize-none"
+							className="w-full px-3.5 py-3 text-sm text-white bg-white/[0.03] border border-white/[0.08] rounded-xl outline-none placeholder:text-neutral-600 focus-visible:border-zuper-500/40 focus-visible:ring-2 focus-visible:ring-zuper-500/20 resize-none"
 						/>
 					</div>
 
@@ -248,9 +248,9 @@ export default function Step5LeadCapture({ roofData, desiredMaterial, timeline, 
 							className={cn(
 								'w-full h-13 rounded-2xl text-sm font-bold tracking-wide',
 								'inline-flex items-center justify-center gap-2 outline-none',
-								'focus-visible:ring-2 focus-visible:ring-emerald-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111]',
+								'focus-visible:ring-2 focus-visible:ring-zuper-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111]',
 								'disabled:opacity-25 disabled:cursor-not-allowed',
-								'bg-emerald-500 text-white hover:bg-emerald-400 active:bg-emerald-600',
+								'bg-zuper-500 text-white hover:bg-zuper-400 active:bg-zuper-600',
 							)}
 							style={{ touchAction: 'manipulation', transition: 'background-color 200ms, opacity 200ms' }}
 						>

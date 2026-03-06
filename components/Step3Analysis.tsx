@@ -15,16 +15,16 @@ interface Step3Props {
 	onContinue: () => void;
 }
 
-const SECTION_PALETTE = ['#34d399', '#60a5fa', '#f472b6', '#fbbf24'];
+const SECTION_PALETTE = ['#8B5CF6', '#60a5fa', '#f472b6', '#fbbf24'];
 
 const SEVERITY_STYLES = {
-	low: { dot: 'bg-emerald-400', bg: 'bg-emerald-400/[0.06]', border: 'border-emerald-400/10', text: 'text-emerald-400' },
+	low: { dot: 'bg-ai-400', bg: 'bg-ai-400/[0.06]', border: 'border-ai-400/10', text: 'text-ai-400' },
 	medium: { dot: 'bg-amber-400', bg: 'bg-amber-400/[0.06]', border: 'border-amber-400/10', text: 'text-amber-400' },
 	high: { dot: 'bg-red-400', bg: 'bg-red-400/[0.06]', border: 'border-red-400/10', text: 'text-red-400' },
 };
 
 const URGENCY_STYLES = {
-	routine: { label: 'Routine', color: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20' },
+	routine: { label: 'Routine', color: 'text-ai-400 bg-ai-400/10 border-ai-400/20' },
 	soon: { label: 'Schedule Soon', color: 'text-amber-400 bg-amber-400/10 border-amber-400/20' },
 	urgent: { label: 'Urgent', color: 'text-red-400 bg-red-400/10 border-red-400/20' },
 };
@@ -35,7 +35,7 @@ function ConditionGauge({ score }: { score: number }) {
 	const circumference = 2 * Math.PI * r;
 	const pct = score / 10;
 	const offset = circumference - pct * circumference;
-	const color = score >= 7 ? '#34d399' : score >= 4.5 ? '#fbbf24' : '#f87171';
+	const color = score >= 7 ? '#8B5CF6' : score >= 4.5 ? '#fbbf24' : '#f87171';
 
 	useEffect(() => {
 		if (!gaugeRef.current) return;
@@ -100,9 +100,9 @@ export default function Step3Analysis({ roofData, aiAnalysis, onContinue }: Step
 
 				{/* Header */}
 				<header data-animate className="pt-20 sm:pt-24 pb-10 text-center">
-					<div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/[0.07] px-3.5 py-1 mb-5">
-						<Sparkles className="h-3 w-3 text-emerald-400" aria-hidden="true" />
-						<span className="text-xs font-semibold tracking-wide text-emerald-400">AI Inspection Complete</span>
+					<div className="inline-flex items-center gap-2 rounded-full border border-ai-500/20 bg-ai-500/[0.07] px-3.5 py-1 mb-5">
+						<Sparkles className="h-3 w-3 text-ai-400" aria-hidden="true" />
+						<span className="text-xs font-semibold tracking-wide text-ai-400">AI Inspection Complete</span>
 					</div>
 
 					<h1 className="font-display text-3xl sm:text-[2.75rem] font-bold text-white mb-3" style={{ textWrap: 'balance' }}>
@@ -243,7 +243,7 @@ export default function Step3Analysis({ roofData, aiAnalysis, onContinue }: Step
 				{aiAnalysis && aiAnalysis.issues.length > 0 && (
 					<div data-animate className="mb-10">
 						<h2 className="text-[11px] font-semibold uppercase tracking-widest text-neutral-500 mb-3 px-1 flex items-center gap-1.5">
-							<Sparkles className="h-3 w-3 text-emerald-400" aria-hidden="true" />
+							<Sparkles className="h-3 w-3 text-ai-400" aria-hidden="true" />
 							AI Detected Issues
 						</h2>
 						<div className="space-y-2">
@@ -281,8 +281,8 @@ export default function Step3Analysis({ roofData, aiAnalysis, onContinue }: Step
 						className={cn(
 							'w-full h-13 rounded-2xl text-sm font-bold tracking-wide',
 							'inline-flex items-center justify-center gap-2 outline-none',
-							'focus-visible:ring-2 focus-visible:ring-emerald-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111]',
-							'bg-emerald-500 text-white hover:bg-emerald-400 active:bg-emerald-600',
+							'focus-visible:ring-2 focus-visible:ring-zuper-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111]',
+							'bg-zuper-500 text-white hover:bg-zuper-400 active:bg-zuper-600',
 						)}
 						style={{ touchAction: 'manipulation', transition: 'background-color 200ms' }}
 					>

@@ -79,6 +79,25 @@ export default function Home() {
 		[transitionTo],
 	);
 
+	const numberToStep: Record<number, WizardStep> = {
+		1: 'hero',
+		2: 'scanning',
+		3: 'analysis',
+		4: 'materials',
+		5: 'lead',
+	};
+
+	const handleStepClick = useCallback(
+		(stepNum: number) => {
+			const target = numberToStep[stepNum];
+			if (!target || target === 'scanning') return;
+			const currentNum = stepToNumber[step];
+			if (stepNum >= currentNum) return;
+			transitionTo(target);
+		},
+		[step, transitionTo],
+	);
+
 	useEffect(() => {
 		if (step === 'hero' || step === 'scanning') return;
 
@@ -102,11 +121,11 @@ export default function Home() {
 
 	return (
 		<main>
-			<WizardProgress currentStep={stepToNumber[step]} />
-			<div ref={mainRef}>
-				{step === 'hero' && <Step1Welcome onAddressSelected={handleAddressSelected} />}
-				{step === 'scanning' && roofData && <StepAIScanning roofData={roofData} onComplete={handleScanComplete} />}
-				{step === 'analysis' && roofData && <Step3Analysis roofData={roofData} aiAnalysis={aiAnalysis} onContinue={handleAnalysisContinue} />}
+			<WizardProgress currentStep={stepToNumber[step]} onStepClick={handleStepClick} />
+		<div ref={mainRef}>
+			{(step === 'hero' || step === 'scanning') && <Step1Welcome onAddressSelected={handleAddressSelected} />}
+			{step === 'scanning' && roofData && <StepAIScanning roofData={roofData} onComplete={handleScanComplete} />}
+			{step === 'analysis' && roofData && <Step3Analysis roofData={roofData} aiAnalysis={aiAnalysis} onContinue={handleAnalysisContinue} />}
 				{step === 'materials' && roofData && <StepMaterials roofData={roofData} aiAnalysis={aiAnalysis} onContinue={handleMaterialsContinue} />}
 				{step === 'lead' && roofData && (
 					<Step5LeadCapture
