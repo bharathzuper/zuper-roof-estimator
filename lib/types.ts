@@ -80,3 +80,24 @@ export type WizardStep = 1 | 2 | 3 | 4;
 
 export type DesiredMaterial = 'asphalt' | 'metal' | 'tile';
 export type ProjectTimeline = 'now' | '1-3months' | 'no-timeline';
+
+export interface AIRoofIssue {
+	title: string;
+	severity: 'low' | 'medium' | 'high';
+	description: string;
+}
+
+export interface AIRoofAnalysis {
+	conditionScore: number;
+	conditionLabel: 'Excellent' | 'Good' | 'Fair' | 'Poor';
+	estimatedAge: string;
+	issues: AIRoofIssue[];
+	summary: string;
+	urgency: 'routine' | 'soon' | 'urgent';
+}
+
+export interface AIRecommendation {
+	recommendedMaterial: DesiredMaterial;
+	reasoning: string;
+	materialNotes: Record<string, string>;
+}

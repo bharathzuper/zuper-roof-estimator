@@ -265,7 +265,7 @@ export const MATERIAL_OPTIONS: MaterialOption[] = [
 		description: 'Most popular choice. Affordable, reliable, and available in many styles.',
 		lifespan: '20\u201330 years',
 		priceRange: '$3\u20137/sq ft',
-		imageUrl: 'https://images.unsplash.com/photo-1632759145351-1d592919f522?w=480&h=260&fit=crop&q=80',
+		imageUrl: '/materials/asphalt-shingle.png',
 	},
 	{
 		id: 'metal',
@@ -274,7 +274,7 @@ export const MATERIAL_OPTIONS: MaterialOption[] = [
 		description: 'Extremely durable and energy-efficient. Great for all climates.',
 		lifespan: '40\u201370 years',
 		priceRange: '$5\u201314/sq ft',
-		imageUrl: 'https://images.unsplash.com/photo-1625766763788-95dcce9bf5ac?w=480&h=260&fit=crop&q=80',
+		imageUrl: '/materials/metal-roof.png',
 	},
 	{
 		id: 'tile',
@@ -283,7 +283,7 @@ export const MATERIAL_OPTIONS: MaterialOption[] = [
 		description: 'Premium look with exceptional longevity. Classic Mediterranean style.',
 		lifespan: '50\u2013100 years',
 		priceRange: '$6\u201316/sq ft',
-		imageUrl: 'https://images.unsplash.com/photo-1598228723793-52759bba239c?w=480&h=260&fit=crop&q=80',
+		imageUrl: '/materials/tile-roof.png',
 	},
 ];
 

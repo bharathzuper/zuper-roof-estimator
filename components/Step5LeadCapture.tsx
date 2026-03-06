@@ -4,28 +4,41 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { Check, ArrowRight } from 'lucide-react';
 import gsap from 'gsap';
 import { cn } from '@/lib/utils';
-import { LeadFormData, RoofData, DesiredMaterial, ProjectTimeline } from '@/lib/types';
+import { LeadFormData, RoofData, DesiredMaterial, ProjectTimeline, AIRoofAnalysis } from '@/lib/types';
 import { calculateEstimates } from '@/lib/pricing';
 
 interface Step5Props {
 	roofData: RoofData;
 	desiredMaterial: DesiredMaterial;
 	timeline: ProjectTimeline;
+	aiAnalysis?: AIRoofAnalysis | null;
 	onSubmit?: (data: LeadFormData) => void;
 }
 
-export default function Step5LeadCapture({ roofData, desiredMaterial, timeline, onSubmit }: Step5Props) {
+export default function Step5LeadCapture({ roofData, desiredMaterial, timeline, aiAnalysis, onSubmit }: Step5Props) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
 	const [phone, setPhone] = useState('');
 	const [contactPref, setContactPref] = useState<'email' | 'call' | 'text'>('email');
+	const [projectNotes, setProjectNotes] = useState('');
 	const [submitted, setSubmitted] = useState(false);
 
-	const estimate = useMemo(() => {
+	const { low, mid, high } = useMemo(() => {
 		const tiers = calculateEstimates(roofData.roofAreaSqFt, roofData.pitch, desiredMaterial);
-		return tiers.find((t) => t.tierName === 'Most Popular') ?? tiers[1] ?? tiers[0];
+		return {
+			low: tiers[0],
+			mid: tiers.find((t) => t.tierName === 'Most Popular') ?? tiers[1] ?? tiers[0],
+			high: tiers[tiers.length - 1],
+		};
 	}, [roofData, desiredMaterial]);
+
+	function roundToNearest(n: number, nearest: number) {
+		return Math.round(n / nearest) * nearest;
+	}
+
+	const rangeLow = roundToNearest(low.totalCost, 500);
+	const rangeHigh = roundToNearest(high.totalCost, 500);
 
 	useEffect(() => {
 		if (!containerRef.current) return;
@@ -70,7 +83,7 @@ export default function Step5LeadCapture({ roofData, desiredMaterial, timeline, 
 							You&apos;re All Set!
 						</h1>
 						<p className="text-sm text-neutral-500 max-w-sm mx-auto leading-relaxed">
-							A certified roofer will reach out within 24 hours with a detailed proposal for your <span className="text-emerald-400 font-medium">{estimate.materialName}</span> roof.
+							A certified roofer will reach out within 24 hours to schedule an inspection and provide your exact <span className="text-emerald-400 font-medium">{mid.materialName}</span> quote.
 						</p>
 					</div>
 				</div>
@@ -87,24 +100,35 @@ export default function Step5LeadCapture({ roofData, desiredMaterial, timeline, 
 					<div className="rounded-2xl border border-white/[0.06] bg-white/[0.025] p-5">
 						<div className="flex items-center justify-between mb-3">
 							<div>
-								<div className="text-[10px] font-semibold tracking-[0.12em] uppercase text-neutral-500 mb-0.5">Your Estimate</div>
-								<span className="font-display text-base font-bold text-white">{estimate.materialName}</span>
+								<div className="text-[10px] font-semibold tracking-[0.12em] uppercase text-neutral-500 mb-0.5">Estimated Range</div>
+								<span className="font-display text-base font-bold text-white">{mid.materialName}</span>
 							</div>
 							<div className="text-right">
-								<div className="font-display text-2xl font-extrabold text-emerald-400" style={{ fontVariantNumeric: 'tabular-nums' }}>
-									${estimate.totalCost.toLocaleString()}
+								<div className="font-display text-xl sm:text-2xl font-extrabold text-emerald-400" style={{ fontVariantNumeric: 'tabular-nums' }}>
+									${rangeLow.toLocaleString()} &ndash; ${rangeHigh.toLocaleString()}
 								</div>
-								<div className="text-xs text-neutral-500" style={{ fontVariantNumeric: 'tabular-nums' }}>
-									${estimate.monthlyPayment}/mo &middot; {timelineLabel}
+								<div className="text-xs text-neutral-500">
+									{timelineLabel}
 								</div>
 							</div>
 						</div>
-						<div className="flex items-center gap-2 pt-3 border-t border-white/[0.04]">
-							<span className="text-[10px] text-neutral-600">{estimate.warranty}</span>
-							<span className="text-neutral-700">&middot;</span>
+						<div className="flex flex-wrap items-center gap-2 pt-3 border-t border-white/[0.04]">
 							<span className="text-[10px] text-neutral-600" style={{ fontVariantNumeric: 'tabular-nums' }}>
-								{roofData.roofAreaSqFt.toLocaleString()} sq ft &middot; ${estimate.costPerSqFt}/sq ft
+								{roofData.roofAreaSqFt.toLocaleString()} sq ft
 							</span>
+							{aiAnalysis && (
+								<>
+									<span className="text-neutral-700">&middot;</span>
+									<span className="text-[10px] text-neutral-600">
+										AI Score: <span className={cn(
+											'font-semibold',
+											aiAnalysis.conditionScore >= 7 ? 'text-emerald-400' : aiAnalysis.conditionScore >= 4.5 ? 'text-amber-400' : 'text-red-400',
+										)}>{aiAnalysis.conditionScore}/10</span>
+									</span>
+								</>
+							)}
+							<span className="text-neutral-700">&middot;</span>
+							<span className="text-[10px] text-neutral-600 italic">Based on AI analysis &mdash; final quote may vary</span>
 						</div>
 					</div>
 				</div>
@@ -112,10 +136,10 @@ export default function Step5LeadCapture({ roofData, desiredMaterial, timeline, 
 				{/* Heading */}
 				<div data-animate className="mb-8">
 					<h1 className="font-display font-bold text-white mb-1 text-2xl sm:text-3xl" style={{ textWrap: 'balance' }}>
-						Connect With a Pro
+						Get Your Detailed Quote
 					</h1>
 					<p className="text-sm text-neutral-500">
-						A certified roofer will follow up with a detailed proposal.
+						A certified roofer will inspect your roof and provide an exact, no-obligation quote.
 					</p>
 				</div>
 
@@ -200,6 +224,22 @@ export default function Step5LeadCapture({ roofData, desiredMaterial, timeline, 
 						</div>
 					</div>
 
+					{/* Project notes */}
+					<div data-animate>
+						<label htmlFor="lead-notes" className="block text-xs font-medium text-neutral-400 mb-1.5">
+							Tell us about your project <span className="text-neutral-600">(optional)</span>
+						</label>
+						<textarea
+							id="lead-notes"
+							name="notes"
+							rows={3}
+							value={projectNotes}
+							onChange={(e) => setProjectNotes(e.target.value)}
+							placeholder="Provide any additional details which will help us prepare your roofing estimate\u2026"
+							className="w-full px-3.5 py-3 text-sm text-white bg-white/[0.03] border border-white/[0.08] rounded-xl outline-none placeholder:text-neutral-600 focus-visible:border-emerald-400/40 focus-visible:ring-2 focus-visible:ring-emerald-400/20 resize-none"
+						/>
+					</div>
+
 					{/* Submit */}
 					<div data-animate>
 						<button
@@ -214,7 +254,7 @@ export default function Step5LeadCapture({ roofData, desiredMaterial, timeline, 
 							)}
 							style={{ touchAction: 'manipulation', transition: 'background-color 200ms, opacity 200ms' }}
 						>
-							Get My Proposal
+							Get My Detailed Quote
 							<ArrowRight className="h-4 w-4" aria-hidden="true" />
 						</button>
 					</div>

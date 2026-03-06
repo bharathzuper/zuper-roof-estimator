@@ -2,25 +2,28 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import gsap from 'gsap';
-import { RoofData, DesiredMaterial, ProjectTimeline } from '@/lib/types';
+import { RoofData, DesiredMaterial, ProjectTimeline, AIRoofAnalysis } from '@/lib/types';
 import WizardProgress from '@/components/WizardProgress';
 import Step1Welcome from '@/components/Step1Welcome';
+import StepAIScanning from '@/components/StepAIScanning';
 import Step3Analysis from '@/components/Step3Analysis';
 import StepMaterials from '@/components/StepMaterials';
 import Step5LeadCapture from '@/components/Step5LeadCapture';
 
-type WizardStep = 'hero' | 'analysis' | 'materials' | 'lead';
+type WizardStep = 'hero' | 'scanning' | 'analysis' | 'materials' | 'lead';
 
 const stepToNumber: Record<WizardStep, number> = {
 	hero: 1,
-	analysis: 2,
-	materials: 3,
-	lead: 4,
+	scanning: 2,
+	analysis: 3,
+	materials: 4,
+	lead: 5,
 };
 
 export default function Home() {
 	const [step, setStep] = useState<WizardStep>('hero');
 	const [roofData, setRoofData] = useState<RoofData | null>(null);
+	const [aiAnalysis, setAiAnalysis] = useState<AIRoofAnalysis | null>(null);
 	const [desiredMaterial, setDesiredMaterial] = useState<DesiredMaterial>('asphalt');
 	const [timeline, setTimeline] = useState<ProjectTimeline>('no-timeline');
 	const mainRef = useRef<HTMLDivElement>(null);
@@ -50,6 +53,14 @@ export default function Home() {
 	const handleAddressSelected = useCallback(
 		(data: RoofData) => {
 			setRoofData(data);
+			setStep('scanning');
+		},
+		[],
+	);
+
+	const handleScanComplete = useCallback(
+		(analysis: AIRoofAnalysis) => {
+			setAiAnalysis(analysis);
 			transitionTo('analysis');
 		},
 		[transitionTo],
@@ -69,7 +80,7 @@ export default function Home() {
 	);
 
 	useEffect(() => {
-		if (step === 'hero') return;
+		if (step === 'hero' || step === 'scanning') return;
 
 		let lenis: InstanceType<typeof import('lenis').default> | null = null;
 		let raf: number;
@@ -94,13 +105,15 @@ export default function Home() {
 			<WizardProgress currentStep={stepToNumber[step]} />
 			<div ref={mainRef}>
 				{step === 'hero' && <Step1Welcome onAddressSelected={handleAddressSelected} />}
-				{step === 'analysis' && roofData && <Step3Analysis roofData={roofData} onContinue={handleAnalysisContinue} />}
-				{step === 'materials' && roofData && <StepMaterials roofData={roofData} onContinue={handleMaterialsContinue} />}
+				{step === 'scanning' && roofData && <StepAIScanning roofData={roofData} onComplete={handleScanComplete} />}
+				{step === 'analysis' && roofData && <Step3Analysis roofData={roofData} aiAnalysis={aiAnalysis} onContinue={handleAnalysisContinue} />}
+				{step === 'materials' && roofData && <StepMaterials roofData={roofData} aiAnalysis={aiAnalysis} onContinue={handleMaterialsContinue} />}
 				{step === 'lead' && roofData && (
 					<Step5LeadCapture
 						roofData={roofData}
 						desiredMaterial={desiredMaterial}
 						timeline={timeline}
+						aiAnalysis={aiAnalysis}
 					/>
 				)}
 			</div>

@@ -1,15 +1,17 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import Image from 'next/image';
-import { Check, ArrowRight } from 'lucide-react';
+import { Check, ArrowRight, Sparkles } from 'lucide-react';
 import gsap from 'gsap';
 import { cn } from '@/lib/utils';
-import { RoofData, DesiredMaterial, ProjectTimeline } from '@/lib/types';
+import { RoofData, DesiredMaterial, ProjectTimeline, AIRoofAnalysis, AIRecommendation } from '@/lib/types';
 import { MATERIAL_OPTIONS } from '@/lib/mock-data';
+import { generateMaterialRecommendation } from '@/lib/ai-engine';
 
 interface StepMaterialsProps {
 	roofData: RoofData;
+	aiAnalysis: AIRoofAnalysis | null;
 	onContinue: (material: DesiredMaterial, timeline: ProjectTimeline) => void;
 }
 
@@ -19,8 +21,13 @@ const TIMELINE_OPTIONS: { value: ProjectTimeline; label: string; sub: string }[]
 	{ value: 'no-timeline', label: 'No Rush', sub: 'Just exploring' },
 ];
 
-export default function StepMaterials({ roofData, onContinue }: StepMaterialsProps) {
-	const [material, setMaterial] = useState<DesiredMaterial>('asphalt');
+export default function StepMaterials({ roofData, aiAnalysis, onContinue }: StepMaterialsProps) {
+	const recommendation = useMemo<AIRecommendation | null>(() => {
+		if (!aiAnalysis) return null;
+		return generateMaterialRecommendation(roofData, aiAnalysis);
+	}, [roofData, aiAnalysis]);
+
+	const [material, setMaterial] = useState<DesiredMaterial>(recommendation?.recommendedMaterial ?? 'asphalt');
 	const [timeline, setTimeline] = useState<ProjectTimeline | null>(null);
 	const containerRef = useRef<HTMLDivElement>(null);
 
@@ -54,7 +61,7 @@ export default function StepMaterials({ roofData, onContinue }: StepMaterialsPro
 				</header>
 
 				{/* Material cards */}
-				<div data-animate className="mb-10">
+				<div data-animate className="mb-6">
 					<div
 						role="radiogroup"
 						aria-label="Roofing material"
@@ -62,6 +69,7 @@ export default function StepMaterials({ roofData, onContinue }: StepMaterialsPro
 					>
 						{materials.map((mat) => {
 							const active = material === mat.id;
+							const isRecommended = recommendation?.recommendedMaterial === mat.id;
 							return (
 								<button
 									key={mat.id}
@@ -89,6 +97,16 @@ export default function StepMaterials({ roofData, onContinue }: StepMaterialsPro
 										{active && (
 											<div className="absolute inset-0 bg-emerald-500/10 border-b border-emerald-500/20" />
 										)}
+										{/* AI Recommended badge */}
+										{isRecommended && (
+											<div className="absolute top-3 left-3">
+												<span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/90 backdrop-blur-sm px-2.5 py-1 text-[10px] font-bold text-white shadow-lg shadow-emerald-500/20">
+													<Sparkles className="h-2.5 w-2.5" aria-hidden="true" />
+													AI Pick
+												</span>
+											</div>
+										)}
+										{/* Radio indicator */}
 										<div className="absolute top-3 right-3">
 											<div className={cn(
 												'h-6 w-6 rounded-full flex items-center justify-center backdrop-blur-sm',
@@ -108,7 +126,12 @@ export default function StepMaterials({ roofData, onContinue }: StepMaterialsPro
 										)}>
 											{mat.name}
 										</span>
-										<p className="text-xs leading-relaxed text-neutral-500 mb-3">{mat.description}</p>
+										<p className="text-xs leading-relaxed text-neutral-500 mb-2">{mat.description}</p>
+										{recommendation?.materialNotes[mat.id] && (
+											<p className="text-[11px] leading-relaxed text-neutral-400 mb-2 italic">
+												{recommendation.materialNotes[mat.id]}
+											</p>
+										)}
 										<div className="flex items-center gap-1.5">
 											<span className="rounded-full bg-white/[0.04] px-2 py-0.5 text-[10px] font-medium text-neutral-500">{mat.lifespan}</span>
 											<span className="rounded-full bg-white/[0.04] px-2 py-0.5 text-[10px] font-medium text-neutral-500">{mat.priceRange}</span>
@@ -119,6 +142,27 @@ export default function StepMaterials({ roofData, onContinue }: StepMaterialsPro
 						})}
 					</div>
 				</div>
+
+				{/* AI Reasoning */}
+				{recommendation && (
+					<div data-animate className="mb-10">
+						<div className="rounded-2xl border border-emerald-500/10 bg-emerald-500/[0.03] p-4">
+							<div className="flex items-start gap-3">
+								<div className="mt-0.5 h-5 w-5 rounded-lg bg-emerald-400/10 flex items-center justify-center shrink-0">
+									<Sparkles className="h-3 w-3 text-emerald-400" aria-hidden="true" />
+								</div>
+								<div>
+									<span className="text-[10px] font-semibold uppercase tracking-widest text-emerald-400/70 block mb-1">
+										AI Recommendation
+									</span>
+									<p className="text-sm leading-relaxed text-neutral-400">
+										{recommendation.reasoning}
+									</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				)}
 
 				{/* Timeline */}
 				<div data-animate className="mb-10">

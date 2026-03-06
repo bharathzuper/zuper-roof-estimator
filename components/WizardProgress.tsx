@@ -5,9 +5,10 @@ import { cn } from '@/lib/utils';
 
 const STEPS = [
 	{ label: 'Address', num: 1 },
-	{ label: 'Analysis', num: 2 },
-	{ label: 'Materials', num: 3 },
-	{ label: 'Quote', num: 4 },
+	{ label: 'AI Scan', num: 2 },
+	{ label: 'Analysis', num: 3 },
+	{ label: 'Materials', num: 4 },
+	{ label: 'Quote', num: 5 },
 ];
 
 export default function WizardProgress({ currentStep }: { currentStep: number }) {

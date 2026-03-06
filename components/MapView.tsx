@@ -14,13 +14,14 @@ interface MapViewProps {
 	bearing?: number;
 	className?: string;
 	onLoad?: () => void;
+	interactive?: boolean;
 }
 
 const DEFAULT_CENTER: [number, number] = [-111.8125, 33.3070];
 const DEFAULT_ZOOM = 18;
 
 const MapView = forwardRef<MapViewHandle, MapViewProps>(
-	({ center = DEFAULT_CENTER, zoom = DEFAULT_ZOOM, pitch = 0, bearing = 0, className = '', onLoad }, ref) => {
+	({ center = DEFAULT_CENTER, zoom = DEFAULT_ZOOM, pitch = 0, bearing = 0, className = '', onLoad, interactive = true }, ref) => {
 		const containerRef = useRef<HTMLDivElement>(null);
 		const mapInstanceRef = useRef<InstanceType<typeof import('maplibre-gl').Map> | null>(null);
 
@@ -86,11 +87,17 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
 					zoom,
 					pitch,
 					bearing,
-					attributionControl: false,
-					dragRotate: true,
-					touchZoomRotate: true,
-					maxZoom: 20,
-					minZoom: 3,
+				attributionControl: false,
+				interactive,
+				dragRotate: interactive,
+				touchZoomRotate: interactive,
+				scrollZoom: interactive,
+				boxZoom: interactive,
+				doubleClickZoom: interactive,
+				dragPan: interactive,
+				keyboard: interactive,
+				maxZoom: 20,
+				minZoom: 3,
 				});
 
 				map.on('load', () => {
