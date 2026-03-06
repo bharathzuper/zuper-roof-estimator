@@ -58,8 +58,9 @@ export default function Step5LeadCapture({ roofData, desiredMaterial, timeline, 
 		const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 		if (prefersReduced) return;
 
-		gsap.from('.success-icon', { scale: 0, duration: 0.6, ease: 'back.out(1.7)' });
-		gsap.from('.success-text', { y: 20, opacity: 0, duration: 0.5, ease: 'power3.out', delay: 0.3 });
+		gsap.from('.success-hero', { y: 60, opacity: 0, duration: 0.7, ease: 'power3.out' });
+		gsap.from('.success-icon', { scale: 0, duration: 0.5, ease: 'back.out(1.7)', delay: 0.3 });
+		gsap.from('.success-text', { y: 20, opacity: 0, duration: 0.5, ease: 'power3.out', delay: 0.5 });
 	}, [submitted]);
 
 	const handleSubmit = (e: React.FormEvent) => {
@@ -74,15 +75,20 @@ export default function Step5LeadCapture({ roofData, desiredMaterial, timeline, 
 	if (submitted) {
 		return (
 			<div ref={containerRef} className="min-h-screen bg-[#111] flex items-center justify-center px-5">
-				<div className="text-center">
-					<div className="success-icon mx-auto w-20 h-20 rounded-2xl mb-6 flex items-center justify-center bg-zuper-500/10 border border-zuper-500/25">
-						<Check className="h-9 w-9 text-zuper-500" strokeWidth={2.5} aria-hidden="true" />
+				<div className="text-center max-w-sm mx-auto">
+					<img
+						src="/brand/zuper-hero.png"
+						alt=""
+						className="success-hero mx-auto h-48 sm:h-56 w-auto mb-6 drop-shadow-2xl"
+					/>
+					<div className="success-icon mx-auto w-14 h-14 rounded-full mb-5 flex items-center justify-center bg-zuper-500 shadow-lg shadow-zuper-500/30">
+						<Check className="h-7 w-7 text-white" strokeWidth={3} aria-hidden="true" />
 					</div>
 					<div className="success-text">
-						<h1 className="font-display font-bold text-white mb-2 text-3xl sm:text-4xl" style={{ textWrap: 'balance' }}>
+						<h1 className="font-display font-bold text-white mb-2 text-2xl sm:text-3xl" style={{ textWrap: 'balance' }}>
 							You&apos;re All Set!
 						</h1>
-						<p className="text-sm text-neutral-500 max-w-sm mx-auto leading-relaxed">
+						<p className="text-sm text-neutral-400 max-w-xs mx-auto leading-relaxed">
 							A certified roofer will reach out within 24 hours to schedule an inspection and provide your exact <span className="text-zuper-400 font-medium">{mid.materialName}</span> quote.
 						</p>
 					</div>
