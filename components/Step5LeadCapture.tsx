@@ -58,9 +58,13 @@ export default function Step5LeadCapture({ roofData, desiredMaterial, timeline, 
 		const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 		if (prefersReduced) return;
 
-		gsap.from('.success-hero', { y: 60, opacity: 0, duration: 0.7, ease: 'power3.out' });
-		gsap.from('.success-icon', { scale: 0, duration: 0.5, ease: 'back.out(1.7)', delay: 0.3 });
-		gsap.from('.success-text', { y: 20, opacity: 0, duration: 0.5, ease: 'power3.out', delay: 0.5 });
+		const tl = gsap.timeline({ delay: 0.15 });
+		tl.fromTo('.success-card', { y: 60, opacity: 0, scale: 0.95 }, { y: 0, opacity: 1, scale: 1, duration: 0.6, ease: 'power3.out' })
+		  .fromTo('.success-hero', { y: 50, opacity: 0, scale: 0.85 }, { y: 0, opacity: 1, scale: 1, duration: 0.7, ease: 'back.out(1.4)' }, '-=0.3')
+		  .fromTo('.success-icon', { scale: 0, rotation: -45 }, { scale: 1, rotation: 0, duration: 0.5, ease: 'back.out(2.5)' }, '-=0.2')
+		  .fromTo('.success-title', { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: 'power3.out' }, '-=0.15')
+		  .fromTo('.success-desc', { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: 'power3.out' }, '-=0.15')
+		  .fromTo('.success-cta', { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: 'power3.out' }, '-=0.1');
 	}, [submitted]);
 
 	const handleSubmit = (e: React.FormEvent) => {
@@ -74,24 +78,46 @@ export default function Step5LeadCapture({ roofData, desiredMaterial, timeline, 
 
 	if (submitted) {
 		return (
-			<div ref={containerRef} className="min-h-screen bg-[#111] flex items-center justify-center px-5">
-				<div className="text-center max-w-sm mx-auto">
+			<div ref={containerRef} className="min-h-screen bg-[#111] flex items-center justify-center px-5 overflow-hidden">
+				<div className="relative w-full max-w-sm">
+					{/* Card */}
+					<div className="success-card relative rounded-3xl border border-white/[0.08] bg-gradient-to-b from-neutral-900 to-neutral-950 px-8 pt-32 sm:pt-36 pb-8 text-center shadow-2xl">
+						{/* Checkmark badge at card top */}
+						<div className="success-icon absolute left-1/2 -translate-x-1/2 top-6 w-11 h-11 rounded-full flex items-center justify-center bg-zuper-500 shadow-lg shadow-zuper-500/30">
+							<Check className="h-5 w-5 text-white" strokeWidth={3} aria-hidden="true" />
+						</div>
+
+						<h1 className="success-title font-display font-bold text-white mb-2 text-2xl sm:text-3xl" style={{ textWrap: 'balance' }}>
+							You&apos;re All Set!
+						</h1>
+						<p className="success-desc text-sm text-neutral-400 leading-relaxed mb-6">
+							A certified roofer will reach out within 24 hours to schedule an inspection and provide your exact <span className="text-zuper-400 font-medium">{mid.materialName}</span> quote.
+						</p>
+
+						<div className="success-cta flex items-center justify-center gap-3 pt-5 border-t border-white/[0.06]">
+							<div className="flex items-center gap-2 text-xs text-neutral-500">
+								<span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-zuper-500/10">
+									<Check className="h-3 w-3 text-zuper-400" strokeWidth={3} />
+								</span>
+								Free inspection
+							</div>
+							<span className="text-neutral-700">&middot;</span>
+							<div className="flex items-center gap-2 text-xs text-neutral-500">
+								<span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-zuper-500/10">
+									<Check className="h-3 w-3 text-zuper-400" strokeWidth={3} />
+								</span>
+								No obligation
+							</div>
+						</div>
+					</div>
+
+					{/* Mascot standing on top of card */}
 					<img
 						src="/brand/zuper-hero.png"
 						alt=""
-						className="success-hero mx-auto h-48 sm:h-56 w-auto mb-6 drop-shadow-2xl"
+						className="success-hero absolute z-20 left-1/2 -translate-x-1/2 bottom-[calc(100%-7rem)] sm:bottom-[calc(100%-8rem)] h-56 sm:h-72 w-auto"
+						style={{ filter: 'drop-shadow(0 12px 32px rgba(0,0,0,0.5)) drop-shadow(0 4px 12px rgba(228,74,25,0.15))' }}
 					/>
-					<div className="success-icon mx-auto w-14 h-14 rounded-full mb-5 flex items-center justify-center bg-zuper-500 shadow-lg shadow-zuper-500/30">
-						<Check className="h-7 w-7 text-white" strokeWidth={3} aria-hidden="true" />
-					</div>
-					<div className="success-text">
-						<h1 className="font-display font-bold text-white mb-2 text-2xl sm:text-3xl" style={{ textWrap: 'balance' }}>
-							You&apos;re All Set!
-						</h1>
-						<p className="text-sm text-neutral-400 max-w-xs mx-auto leading-relaxed">
-							A certified roofer will reach out within 24 hours to schedule an inspection and provide your exact <span className="text-zuper-400 font-medium">{mid.materialName}</span> quote.
-						</p>
-					</div>
 				</div>
 			</div>
 		);
