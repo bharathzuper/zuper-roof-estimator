@@ -10,15 +10,17 @@ export interface MapViewHandle {
 interface MapViewProps {
 	center?: [number, number];
 	zoom?: number;
+	pitch?: number;
+	bearing?: number;
 	className?: string;
 	onLoad?: () => void;
 }
 
-const DEFAULT_CENTER: [number, number] = [-96.7714, 32.8143];
-const DEFAULT_ZOOM = 16;
+const DEFAULT_CENTER: [number, number] = [-111.8125, 33.3070];
+const DEFAULT_ZOOM = 18;
 
 const MapView = forwardRef<MapViewHandle, MapViewProps>(
-	({ center = DEFAULT_CENTER, zoom = DEFAULT_ZOOM, className = '', onLoad }, ref) => {
+	({ center = DEFAULT_CENTER, zoom = DEFAULT_ZOOM, pitch = 0, bearing = 0, className = '', onLoad }, ref) => {
 		const containerRef = useRef<HTMLDivElement>(null);
 		const mapInstanceRef = useRef<InstanceType<typeof import('maplibre-gl').Map> | null>(null);
 
@@ -46,10 +48,11 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
 
 		useEffect(() => {
 			if (!containerRef.current) return;
+			let cancelled = false;
 			let map: InstanceType<typeof import('maplibre-gl').Map> | null = null;
 
 			import('maplibre-gl').then((maplibregl) => {
-				if (!containerRef.current) return;
+				if (cancelled || !containerRef.current) return;
 
 				map = new maplibregl.Map({
 					container: containerRef.current,
@@ -81,8 +84,8 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
 					},
 					center,
 					zoom,
-					pitch: 0,
-					bearing: 0,
+					pitch,
+					bearing,
 					attributionControl: false,
 					dragRotate: true,
 					touchZoomRotate: true,
@@ -91,12 +94,14 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
 				});
 
 				map.on('load', () => {
+					if (cancelled) { map?.remove(); return; }
 					mapInstanceRef.current = map;
 					onLoad?.();
 				});
 			});
 
 			return () => {
+				cancelled = true;
 				map?.remove();
 				mapInstanceRef.current = null;
 			};

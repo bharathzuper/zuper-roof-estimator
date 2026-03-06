@@ -2,19 +2,19 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import gsap from 'gsap';
-import { RoofData, DesiredMaterial, ProjectTimeline, TierEstimate } from '@/lib/types';
+import { RoofData, DesiredMaterial, ProjectTimeline } from '@/lib/types';
 import WizardProgress from '@/components/WizardProgress';
 import Step1Welcome from '@/components/Step1Welcome';
 import Step3Analysis from '@/components/Step3Analysis';
-import Step4Estimate from '@/components/Step4Estimate';
+import StepMaterials from '@/components/StepMaterials';
 import Step5LeadCapture from '@/components/Step5LeadCapture';
 
-type WizardStep = 'hero' | 'analysis' | 'estimate' | 'lead';
+type WizardStep = 'hero' | 'analysis' | 'materials' | 'lead';
 
 const stepToNumber: Record<WizardStep, number> = {
 	hero: 1,
 	analysis: 2,
-	estimate: 3,
+	materials: 3,
 	lead: 4,
 };
 
@@ -22,7 +22,7 @@ export default function Home() {
 	const [step, setStep] = useState<WizardStep>('hero');
 	const [roofData, setRoofData] = useState<RoofData | null>(null);
 	const [desiredMaterial, setDesiredMaterial] = useState<DesiredMaterial>('asphalt');
-	const [selectedTier, setSelectedTier] = useState<TierEstimate | null>(null);
+	const [timeline, setTimeline] = useState<ProjectTimeline>('no-timeline');
 	const mainRef = useRef<HTMLDivElement>(null);
 
 	const transitionTo = useCallback((nextStep: WizardStep) => {
@@ -55,23 +55,19 @@ export default function Home() {
 		[transitionTo],
 	);
 
-	const handleAnalysisContinue = useCallback(
-		(material: DesiredMaterial, _timeline: ProjectTimeline) => {
-			setDesiredMaterial(material);
-			transitionTo('estimate');
-		},
-		[transitionTo],
-	);
+	const handleAnalysisContinue = useCallback(() => {
+		transitionTo('materials');
+	}, [transitionTo]);
 
-	const handleTierSelected = useCallback(
-		(tier: TierEstimate) => {
-			setSelectedTier(tier);
+	const handleMaterialsContinue = useCallback(
+		(material: DesiredMaterial, tl: ProjectTimeline) => {
+			setDesiredMaterial(material);
+			setTimeline(tl);
 			transitionTo('lead');
 		},
 		[transitionTo],
 	);
 
-	// Lenis smooth scroll (only for scrollable steps, not the hero)
 	useEffect(() => {
 		if (step === 'hero') return;
 
@@ -99,8 +95,14 @@ export default function Home() {
 			<div ref={mainRef}>
 				{step === 'hero' && <Step1Welcome onAddressSelected={handleAddressSelected} />}
 				{step === 'analysis' && roofData && <Step3Analysis roofData={roofData} onContinue={handleAnalysisContinue} />}
-				{step === 'estimate' && roofData && <Step4Estimate roofData={roofData} desiredMaterial={desiredMaterial} onSelectTier={handleTierSelected} />}
-				{step === 'lead' && roofData && selectedTier && <Step5LeadCapture selectedTier={selectedTier} roofData={roofData} />}
+				{step === 'materials' && roofData && <StepMaterials roofData={roofData} onContinue={handleMaterialsContinue} />}
+				{step === 'lead' && roofData && (
+					<Step5LeadCapture
+						roofData={roofData}
+						desiredMaterial={desiredMaterial}
+						timeline={timeline}
+					/>
+				)}
 			</div>
 		</main>
 	);

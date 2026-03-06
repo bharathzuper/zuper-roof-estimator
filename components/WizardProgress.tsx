@@ -1,6 +1,14 @@
 'use client';
 
-const STEPS = ['Address', 'Analysis', 'Estimate', 'Quote'];
+import { Check, Home } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+const STEPS = [
+	{ label: 'Address', num: 1 },
+	{ label: 'Analysis', num: 2 },
+	{ label: 'Materials', num: 3 },
+	{ label: 'Quote', num: 4 },
+];
 
 export default function WizardProgress({ currentStep }: { currentStep: number }) {
 	if (currentStep <= 1) return null;
@@ -8,70 +16,63 @@ export default function WizardProgress({ currentStep }: { currentStep: number })
 	const progress = ((currentStep - 1) / (STEPS.length - 1)) * 100;
 
 	return (
-		<div className="fixed top-0 left-0 right-0 z-50">
-			{/* Progress bar */}
-			<div className="h-[2px]" style={{ background: 'var(--color-border)' }}>
+		<div className="fixed top-0 inset-x-0 z-50">
+			{/* Thin progress bar */}
+			<div className="h-0.5 bg-white/[0.06]">
 				<div
-					className="h-full transition-all duration-500 ease-out"
-					style={{ width: `${progress}%`, background: 'var(--color-accent)' }}
+					className="h-full bg-emerald-400"
+					style={{ width: `${progress}%`, transition: 'width 500ms ease-out' }}
 				/>
 			</div>
 
-			{/* Step row */}
-			<div
-				className="backdrop-blur-xl"
-				style={{
-					background: 'rgba(8,8,8,0.8)',
-					borderBottom: '1px solid var(--color-border)',
-				}}
-			>
-				<div className="max-w-4xl mx-auto px-5 py-2.5 flex items-center justify-between">
+			{/* Nav row */}
+			<div className="bg-[#111]/90 backdrop-blur-xl border-b border-white/[0.06]">
+				<div className="mx-auto max-w-5xl flex items-center justify-between px-5 h-11">
 					{/* Logo */}
 					<div className="flex items-center gap-2">
-						<div className="w-5 h-5 rounded flex items-center justify-center" style={{ background: 'var(--color-accent)' }}>
-							<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#080808" strokeWidth="3">
-								<path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-							</svg>
+						<div className="h-5 w-5 rounded bg-emerald-400 flex items-center justify-center">
+							<Home className="h-2.5 w-2.5 text-[#111]" strokeWidth={2.5} aria-hidden="true" />
 						</div>
-						<span className="font-display text-[10px] font-bold tracking-[0.12em] uppercase" style={{ color: 'var(--color-text-tertiary)' }}>
+						<span className="text-[10px] font-bold tracking-[0.12em] uppercase text-neutral-500">
 							Zuper
 						</span>
 					</div>
 
 					{/* Steps */}
-					<div className="flex items-center gap-5">
-						{STEPS.map((label, i) => {
-							const stepNum = i + 1;
-							const done = stepNum < currentStep;
-							const active = stepNum === currentStep;
+					<nav aria-label="Wizard progress" className="flex items-center gap-1 sm:gap-4">
+						{STEPS.map((step, i) => {
+							const done = step.num < currentStep;
+							const active = step.num === currentStep;
 							return (
-								<div key={label} className="flex items-center gap-2">
+								<div key={step.label} className="flex items-center gap-1.5">
+									{i > 0 && <div className="hidden sm:block w-4 h-px bg-white/[0.06]" />}
 									<div
-										className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold transition-all"
-										style={{
-											background: done ? 'var(--color-accent)' : active ? 'var(--color-accent-muted)' : 'rgba(255,255,255,0.03)',
-											color: done ? '#080808' : active ? 'var(--color-accent)' : 'var(--color-text-tertiary)',
-											border: active ? '1px solid rgba(136,255,87,0.3)' : 'none',
-										}}
+										className={cn(
+											'h-5 w-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0',
+											done && 'bg-emerald-400 text-[#111]',
+											active && 'bg-emerald-400/15 text-emerald-400 ring-1 ring-emerald-400/30',
+											!done && !active && 'bg-white/[0.04] text-neutral-600',
+										)}
+										aria-current={active ? 'step' : undefined}
 									>
 										{done ? (
-											<svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-												<polyline points="20 6 9 17 4 12" />
-											</svg>
+											<Check className="h-2.5 w-2.5" strokeWidth={3} aria-hidden="true" />
 										) : (
-											stepNum
+											step.num
 										)}
 									</div>
 									<span
-										className="text-xs font-medium hidden sm:inline"
-										style={{ color: active ? 'var(--color-text-secondary)' : 'var(--color-text-tertiary)' }}
+										className={cn(
+											'text-[11px] font-medium hidden sm:inline',
+											active ? 'text-neutral-300' : 'text-neutral-600',
+										)}
 									>
-										{label}
+										{step.label}
 									</span>
 								</div>
 							);
 						})}
-					</div>
+					</nav>
 				</div>
 			</div>
 		</div>

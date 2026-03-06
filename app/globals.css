@@ -1,20 +1,52 @@
-@import 'tailwindcss';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@theme inline {
-	--font-display: var(--font-syne);
-	--font-body: var(--font-dm);
+@layer base {
+	:root {
+		--background: 0 0% 100%;
+		--foreground: 0 0% 3.9%;
+		--card: 0 0% 100%;
+		--card-foreground: 0 0% 3.9%;
+		--popover: 0 0% 100%;
+		--popover-foreground: 0 0% 3.9%;
+		--primary: 0 0% 9%;
+		--primary-foreground: 0 0% 98%;
+		--secondary: 0 0% 96.1%;
+		--secondary-foreground: 0 0% 9%;
+		--muted: 0 0% 96.1%;
+		--muted-foreground: 0 0% 45.1%;
+		--accent: 0 0% 96.1%;
+		--accent-foreground: 0 0% 9%;
+		--destructive: 0 84.2% 60.2%;
+		--destructive-foreground: 0 0% 98%;
+		--border: 0 0% 89.8%;
+		--input: 0 0% 89.8%;
+		--ring: 0 0% 3.9%;
+		--radius: 0.5rem;
+	}
 
-	--color-base: #080808;
-	--color-surface: #0f0f0f;
-	--color-elevated: #171717;
-	--color-accent: #88ff57;
-	--color-accent-muted: rgba(136, 255, 87, 0.1);
-	--color-border: rgba(255, 255, 255, 0.08);
-	--color-border-strong: rgba(255, 255, 255, 0.16);
-	--color-border-input: rgba(255, 255, 255, 0.14);
-	--color-text-primary: #f0f0f0;
-	--color-text-secondary: #888888;
-	--color-text-tertiary: #555555;
+	.dark {
+		--background: 0 0% 3.9%;
+		--foreground: 0 0% 98%;
+		--card: 0 0% 3.9%;
+		--card-foreground: 0 0% 98%;
+		--popover: 0 0% 3.9%;
+		--popover-foreground: 0 0% 98%;
+		--primary: 0 0% 98%;
+		--primary-foreground: 0 0% 9%;
+		--secondary: 0 0% 14.9%;
+		--secondary-foreground: 0 0% 98%;
+		--muted: 0 0% 14.9%;
+		--muted-foreground: 0 0% 63.9%;
+		--accent: 0 0% 14.9%;
+		--accent-foreground: 0 0% 98%;
+		--destructive: 0 62.8% 30.6%;
+		--destructive-foreground: 0 0% 98%;
+		--border: 0 0% 14.9%;
+		--input: 0 0% 14.9%;
+		--ring: 0 0% 83.1%;
+	}
 }
 
 *,
@@ -31,32 +63,21 @@ html {
 }
 
 body {
-	font-family: var(--font-body), system-ui, -apple-system, sans-serif;
-	background: var(--color-base);
-	color: var(--color-text-primary);
+	font-family: var(--font-inter), var(--font-dm), system-ui, -apple-system, sans-serif;
+	background: #111;
+	color: #e5e5e5;
 	overflow-x: hidden;
 	font-size: 15px;
-	line-height: 1.65;
+	line-height: 1.6;
 }
 
 h1, h2, h3, h4, .font-display {
-	font-family: var(--font-display), system-ui, sans-serif;
-	line-height: 0.95;
+	font-family: var(--font-inter), system-ui, sans-serif;
+	line-height: 1.15;
+	letter-spacing: -0.02em;
 }
 
-/* ── Fixed noise grain ── */
-.grain::after {
-	content: '';
-	position: fixed;
-	inset: 0;
-	background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-	opacity: 0.035;
-	pointer-events: none;
-	z-index: 9999;
-	mix-blend-mode: overlay;
-}
-
-/* ── Map vignette (lighter — let the map breathe) ── */
+/* ── Map vignette (landing page only) ── */
 .vignette::before {
 	content: '';
 	position: absolute;
@@ -64,92 +85,11 @@ h1, h2, h3, h4, .font-display {
 	background: radial-gradient(
 		ellipse at center,
 		transparent 30%,
-		rgba(8, 8, 8, 0.30) 70%,
-		rgba(8, 8, 8, 0.75) 100%
+		rgba(17, 17, 17, 0.4) 70%,
+		rgba(17, 17, 17, 0.9) 100%
 	);
 	pointer-events: none;
 	z-index: 2;
-}
-
-/* ── Hero text shadow ── */
-.text-shadow-hero {
-	text-shadow: 0 2px 30px rgba(0, 0, 0, 0.6), 0 1px 8px rgba(0, 0, 0, 0.4);
-}
-
-/* ── Accent glow ── */
-.glow-accent::before {
-	content: '';
-	position: absolute;
-	width: 500px;
-	height: 500px;
-	background: radial-gradient(circle, rgba(136, 255, 87, 0.08) 0%, transparent 70%);
-	top: -200px;
-	left: 50%;
-	transform: translateX(-50%);
-	pointer-events: none;
-}
-
-/* ── Reusable: input field (dark theme forms) ── */
-.input-field {
-	width: 100%;
-	height: 44px;
-	padding: 0 14px;
-	font-size: 14px;
-	color: var(--color-text-primary);
-	background: rgba(255, 255, 255, 0.05);
-	border: 1px solid var(--color-border-input);
-	border-radius: 8px;
-	outline: none;
-	transition: border-color 0.2s, box-shadow 0.2s;
-}
-.input-field::placeholder {
-	color: var(--color-text-tertiary);
-}
-.input-field:focus {
-	border-color: rgba(136, 255, 87, 0.4);
-	box-shadow: 0 0 0 3px rgba(136, 255, 87, 0.1);
-}
-
-/* ── Reusable: primary button ── */
-.btn-primary {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: 100%;
-	height: 48px;
-	padding: 0 24px;
-	font-family: var(--font-display), system-ui, sans-serif;
-	font-size: 14px;
-	font-weight: 700;
-	letter-spacing: 0.02em;
-	color: #080808;
-	background: var(--color-accent);
-	border: none;
-	border-radius: 8px;
-	cursor: pointer;
-	transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
-}
-.btn-primary:hover {
-	transform: translateY(-1px);
-	box-shadow: 0 6px 20px rgba(136, 255, 87, 0.2);
-}
-.btn-primary:disabled {
-	opacity: 0.3;
-	cursor: not-allowed;
-	transform: none;
-	box-shadow: none;
-}
-
-/* ── Reusable: card surface ── */
-.card-surface {
-	background: var(--color-surface);
-	border: 1px solid var(--color-border-strong);
-	border-radius: 12px;
-	transition: transform 0.25s ease, border-color 0.25s ease;
-}
-.card-surface:hover {
-	border-color: rgba(255, 255, 255, 0.22);
-	transform: translateY(-2px);
 }
 
 /* ── Tabular nums ── */
@@ -168,9 +108,18 @@ h1, h2, h3, h4, .font-display {
 	100% { transform: translateY(300%); }
 }
 
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+	*, *::before, *::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
+}
+
 /* ── Selection ── */
 ::selection {
-	background: rgba(136, 255, 87, 0.25);
+	background: rgba(20, 184, 166, 0.25);
 	color: #fff;
 }
 

@@ -1,16 +1,20 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
+import { Check, ArrowRight } from 'lucide-react';
 import gsap from 'gsap';
-import { LeadFormData, TierEstimate, RoofData } from '@/lib/types';
+import { cn } from '@/lib/utils';
+import { LeadFormData, RoofData, DesiredMaterial, ProjectTimeline } from '@/lib/types';
+import { calculateEstimates } from '@/lib/pricing';
 
 interface Step5Props {
-	selectedTier: TierEstimate;
-	roofData?: RoofData;
+	roofData: RoofData;
+	desiredMaterial: DesiredMaterial;
+	timeline: ProjectTimeline;
 	onSubmit?: (data: LeadFormData) => void;
 }
 
-export default function Step5LeadCapture({ selectedTier, onSubmit, roofData: _roofData }: Step5Props) {
+export default function Step5LeadCapture({ roofData, desiredMaterial, timeline, onSubmit }: Step5Props) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
@@ -18,134 +22,176 @@ export default function Step5LeadCapture({ selectedTier, onSubmit, roofData: _ro
 	const [contactPref, setContactPref] = useState<'email' | 'call' | 'text'>('email');
 	const [submitted, setSubmitted] = useState(false);
 
+	const estimate = useMemo(() => {
+		const tiers = calculateEstimates(roofData.roofAreaSqFt, roofData.pitch, desiredMaterial);
+		return tiers.find((t) => t.tierName === 'Most Popular') ?? tiers[1] ?? tiers[0];
+	}, [roofData, desiredMaterial]);
+
 	useEffect(() => {
 		if (!containerRef.current) return;
-		const ctx = gsap.context(() => {
-			gsap.from('.lead-banner', { y: 20, opacity: 0, duration: 0.5, ease: 'power3.out', delay: 0.2 });
-			gsap.from('.lead-heading', { y: 30, opacity: 0, duration: 0.7, ease: 'power4.out', delay: 0.35 });
-			gsap.from('.lead-sub', { y: 12, opacity: 0, duration: 0.5, ease: 'power3.out', delay: 0.5 });
-			gsap.from('.lead-field', { y: 16, opacity: 0, duration: 0.4, ease: 'power2.out', stagger: 0.07, delay: 0.6 });
-			gsap.from('.lead-cta', { y: 12, opacity: 0, duration: 0.5, ease: 'power3.out', delay: 0.9 });
-		}, containerRef);
-		return () => ctx.revert();
+		const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		if (prefersReduced) return;
+
+		const sections = containerRef.current.querySelectorAll<HTMLElement>('[data-animate]');
+		gsap.fromTo(
+			sections,
+			{ opacity: 0, y: 20 },
+			{ opacity: 1, y: 0, duration: 0.45, stagger: 0.07, ease: 'power3.out', delay: 0.15 },
+		);
 	}, []);
 
 	useEffect(() => {
 		if (!submitted || !containerRef.current) return;
-		const ctx = gsap.context(() => {
-			gsap.from('.success-icon', { scale: 0, duration: 0.6, ease: 'back.out(1.7)' });
-			gsap.from('.success-heading', { y: 20, opacity: 0, duration: 0.5, ease: 'power3.out', delay: 0.3 });
-			gsap.from('.success-sub', { y: 12, opacity: 0, duration: 0.4, ease: 'power2.out', delay: 0.5 });
-		}, containerRef);
-		return () => ctx.revert();
+		const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		if (prefersReduced) return;
+
+		gsap.from('.success-icon', { scale: 0, duration: 0.6, ease: 'back.out(1.7)' });
+		gsap.from('.success-text', { y: 20, opacity: 0, duration: 0.5, ease: 'power3.out', delay: 0.3 });
 	}, [submitted]);
 
-	const handleSubmit = () => {
+	const handleSubmit = (e: React.FormEvent) => {
+		e.preventDefault();
 		if (!name || !email) return;
 		onSubmit?.({ name, email, phone, preferredContact: contactPref });
 		setSubmitted(true);
 	};
 
+	const timelineLabel = timeline === 'now' ? 'ASAP' : timeline === '1-3months' ? '1–3 months' : 'Flexible';
+
 	if (submitted) {
 		return (
-			<div ref={containerRef} className="min-h-screen bg-[#080808] flex items-center justify-center px-5">
+			<div ref={containerRef} className="min-h-screen bg-[#111] flex items-center justify-center px-5">
 				<div className="text-center">
-					<div className="success-icon mx-auto w-20 h-20 rounded-2xl mb-6 flex items-center justify-center bg-[rgba(136,255,87,0.12)] border border-[rgba(136,255,87,0.3)]">
-						<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#88ff57" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-							<polyline points="20 6 9 17 4 12" />
-						</svg>
+					<div className="success-icon mx-auto w-20 h-20 rounded-2xl mb-6 flex items-center justify-center bg-emerald-400/10 border border-emerald-400/25">
+						<Check className="h-9 w-9 text-emerald-400" strokeWidth={2.5} aria-hidden="true" />
 					</div>
-					<h2 className="success-heading font-display font-bold text-white mb-2" style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)' }}>
-						You&apos;re All Set!
-					</h2>
-					<p className="success-sub text-sm text-[#555] max-w-sm mx-auto">
-						A certified roofer will reach out within 24 hours with a detailed proposal for your <span className="text-[#88ff57] font-medium">{selectedTier.tierName}</span> roof.
-					</p>
+					<div className="success-text">
+						<h1 className="font-display font-bold text-white mb-2 text-3xl sm:text-4xl" style={{ textWrap: 'balance' }}>
+							You&apos;re All Set!
+						</h1>
+						<p className="text-sm text-neutral-500 max-w-sm mx-auto leading-relaxed">
+							A certified roofer will reach out within 24 hours with a detailed proposal for your <span className="text-emerald-400 font-medium">{estimate.materialName}</span> roof.
+						</p>
+					</div>
 				</div>
 			</div>
 		);
 	}
 
 	return (
-		<div ref={containerRef} className="min-h-screen bg-[#080808] relative overflow-hidden">
-			<div
-				className="absolute pointer-events-none"
-				style={{ width: 500, height: 500, bottom: -200, left: -100, background: 'radial-gradient(circle, rgba(136,255,87,0.05) 0%, transparent 70%)' }}
-			/>
+		<div ref={containerRef} className="min-h-screen bg-[#111] pb-20">
+			<div className="mx-auto max-w-md px-5 sm:px-0">
 
-			<div className="relative z-10 max-w-md mx-auto px-5 sm:px-0 py-16 sm:py-24">
-				{/* Selected tier banner */}
-				<div className="lead-banner card-surface p-5 mb-8">
-					<div className="flex items-center justify-between">
-						<div>
-							<div className="text-[10px] font-semibold tracking-[0.12em] uppercase text-[#555]">Selected Plan</div>
-							<span className="font-display text-lg font-bold text-white">{selectedTier.tierName} · {selectedTier.materialName}</span>
-						</div>
-						<div className="text-right">
-							<div className="tabular font-display text-2xl font-extrabold text-[#88ff57]">
-								${selectedTier.totalCost.toLocaleString()}
+				{/* Estimate summary banner */}
+				<div data-animate className="pt-20 sm:pt-24 mb-8">
+					<div className="rounded-2xl border border-white/[0.06] bg-white/[0.025] p-5">
+						<div className="flex items-center justify-between mb-3">
+							<div>
+								<div className="text-[10px] font-semibold tracking-[0.12em] uppercase text-neutral-500 mb-0.5">Your Estimate</div>
+								<span className="font-display text-base font-bold text-white">{estimate.materialName}</span>
 							</div>
-							<div className="text-xs tabular text-[#555]">${selectedTier.monthlyPayment}/mo</div>
+							<div className="text-right">
+								<div className="font-display text-2xl font-extrabold text-emerald-400" style={{ fontVariantNumeric: 'tabular-nums' }}>
+									${estimate.totalCost.toLocaleString()}
+								</div>
+								<div className="text-xs text-neutral-500" style={{ fontVariantNumeric: 'tabular-nums' }}>
+									${estimate.monthlyPayment}/mo &middot; {timelineLabel}
+								</div>
+							</div>
+						</div>
+						<div className="flex items-center gap-2 pt-3 border-t border-white/[0.04]">
+							<span className="text-[10px] text-neutral-600">{estimate.warranty}</span>
+							<span className="text-neutral-700">&middot;</span>
+							<span className="text-[10px] text-neutral-600" style={{ fontVariantNumeric: 'tabular-nums' }}>
+								{roofData.roofAreaSqFt.toLocaleString()} sq ft &middot; ${estimate.costPerSqFt}/sq ft
+							</span>
 						</div>
 					</div>
 				</div>
 
 				{/* Heading */}
-				<h2 className="lead-heading font-display font-bold text-white mb-1" style={{ fontSize: 'clamp(1.6rem, 4vw, 2.2rem)' }}>
-					Connect with a Pro
-				</h2>
-				<p className="lead-sub text-sm text-[#555] mb-8">
-					A certified roofer will follow up with a detailed proposal.
-				</p>
+				<div data-animate className="mb-8">
+					<h1 className="font-display font-bold text-white mb-1 text-2xl sm:text-3xl" style={{ textWrap: 'balance' }}>
+						Connect With a Pro
+					</h1>
+					<p className="text-sm text-neutral-500">
+						A certified roofer will follow up with a detailed proposal.
+					</p>
+				</div>
 
 				{/* Form */}
-				<div className="space-y-4">
-					<div className="lead-field">
-						<label className="block text-xs font-medium text-[#888] mb-1.5">Full Name *</label>
+				<form onSubmit={handleSubmit} className="space-y-5" noValidate>
+					<div data-animate>
+						<label htmlFor="lead-name" className="block text-xs font-medium text-neutral-400 mb-1.5">Full Name *</label>
 						<input
+							id="lead-name"
+							name="name"
 							type="text"
+							autoComplete="name"
+							required
 							value={name}
 							onChange={(e) => setName(e.target.value)}
-							placeholder="Jane Smith"
-							className="input-field"
+							placeholder="Jane Smith\u2026"
+							className="w-full h-11 px-3.5 text-sm text-white bg-white/[0.03] border border-white/[0.08] rounded-xl outline-none placeholder:text-neutral-600 focus-visible:border-emerald-400/40 focus-visible:ring-2 focus-visible:ring-emerald-400/20"
 						/>
 					</div>
-					<div className="lead-field">
-						<label className="block text-xs font-medium text-[#888] mb-1.5">Email *</label>
+
+					<div data-animate>
+						<label htmlFor="lead-email" className="block text-xs font-medium text-neutral-400 mb-1.5">Email *</label>
 						<input
+							id="lead-email"
+							name="email"
 							type="email"
+							autoComplete="email"
+							spellCheck={false}
+							required
 							value={email}
 							onChange={(e) => setEmail(e.target.value)}
-							placeholder="jane@example.com"
-							className="input-field"
+							placeholder="jane@example.com\u2026"
+							className="w-full h-11 px-3.5 text-sm text-white bg-white/[0.03] border border-white/[0.08] rounded-xl outline-none placeholder:text-neutral-600 focus-visible:border-emerald-400/40 focus-visible:ring-2 focus-visible:ring-emerald-400/20"
 						/>
 					</div>
-					<div className="lead-field">
-						<label className="block text-xs font-medium text-[#888] mb-1.5">Phone</label>
+
+					<div data-animate>
+						<label htmlFor="lead-phone" className="block text-xs font-medium text-neutral-400 mb-1.5">Phone</label>
 						<input
+							id="lead-phone"
+							name="phone"
 							type="tel"
+							autoComplete="tel"
+							inputMode="tel"
 							value={phone}
 							onChange={(e) => setPhone(e.target.value)}
-							placeholder="(555) 000-0000"
-							className="input-field"
+							placeholder="(555) 000-0000\u2026"
+							className="w-full h-11 px-3.5 text-sm text-white bg-white/[0.03] border border-white/[0.08] rounded-xl outline-none placeholder:text-neutral-600 focus-visible:border-emerald-400/40 focus-visible:ring-2 focus-visible:ring-emerald-400/20"
 						/>
 					</div>
 
 					{/* Contact preference */}
-					<div className="lead-field">
-						<label className="block text-xs font-medium text-[#888] mb-2">Preferred Contact</label>
-						<div className="flex gap-2">
+					<div data-animate>
+						<span className="block text-xs font-medium text-neutral-400 mb-2">Preferred Contact</span>
+						<div
+							role="radiogroup"
+							aria-label="Preferred contact method"
+							className="flex gap-2"
+						>
 							{(['email', 'call', 'text'] as const).map((opt) => {
-								const isActive = contactPref === opt;
+								const active = contactPref === opt;
 								return (
 									<button
 										key={opt}
+										type="button"
+										role="radio"
+										aria-checked={active}
 										onClick={() => setContactPref(opt)}
-										className={`flex-1 h-10 rounded-lg text-xs font-semibold capitalize transition-all border ${
-											isActive
-												? 'bg-[rgba(136,255,87,0.1)] text-[#88ff57] border-[rgba(136,255,87,0.3)]'
-												: 'text-[#555] border-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.16)] hover:text-[#888]'
-										}`}
+										className={cn(
+											'flex-1 h-10 rounded-xl text-xs font-semibold capitalize border outline-none',
+											'focus-visible:ring-2 focus-visible:ring-emerald-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111]',
+											active
+												? 'bg-emerald-500/[0.08] text-emerald-400 border-emerald-500/25'
+												: 'text-neutral-500 border-white/[0.08] hover:border-white/[0.14] hover:text-neutral-400',
+										)}
+										style={{ touchAction: 'manipulation', transition: 'background-color 200ms, border-color 200ms, color 200ms' }}
 									>
 										{opt}
 									</button>
@@ -155,18 +201,28 @@ export default function Step5LeadCapture({ selectedTier, onSubmit, roofData: _ro
 					</div>
 
 					{/* Submit */}
-					<button
-						onClick={handleSubmit}
-						disabled={!name || !email}
-						className="lead-cta btn-primary mt-2"
-					>
-						Get My Proposal
-					</button>
+					<div data-animate>
+						<button
+							type="submit"
+							disabled={!name || !email}
+							className={cn(
+								'w-full h-13 rounded-2xl text-sm font-bold tracking-wide',
+								'inline-flex items-center justify-center gap-2 outline-none',
+								'focus-visible:ring-2 focus-visible:ring-emerald-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111]',
+								'disabled:opacity-25 disabled:cursor-not-allowed',
+								'bg-emerald-500 text-white hover:bg-emerald-400 active:bg-emerald-600',
+							)}
+							style={{ touchAction: 'manipulation', transition: 'background-color 200ms, opacity 200ms' }}
+						>
+							Get My Proposal
+							<ArrowRight className="h-4 w-4" aria-hidden="true" />
+						</button>
+					</div>
 
-					<p className="text-center text-[10px] text-[#555] mt-3">
+					<p data-animate className="text-center text-[10px] text-neutral-600 mt-3">
 						By submitting, you agree to our Terms and Privacy Policy.
 					</p>
-				</div>
+				</form>
 			</div>
 		</div>
 	);
